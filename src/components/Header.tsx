@@ -56,7 +56,7 @@ const Header = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/features" className="flex items-center cursor-pointer">
+                  <Link to="/teams" className="flex items-center cursor-pointer">
                     <Users className="mr-2 h-4 w-4" />
                     <span>Teams</span>
                   </Link>
