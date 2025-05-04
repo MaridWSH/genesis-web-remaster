@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { FileChartLine } from 'lucide-react';
+import { BarChart as BarChartIcon, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 
 const DeepAnalytics: React.FC = () => {
   const { tasks } = useTasks();
@@ -67,191 +67,287 @@ const DeepAnalytics: React.FC = () => {
   };
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center">
-              <FileChartLine className="h-5 w-5 mr-2 text-primary" />
-              Deep Analytics & Productivity Insights
-            </CardTitle>
-            <CardDescription>
-              Visualize performance data and optimize productivity
-            </CardDescription>
-          </div>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[120px] h-8">
-              <SelectValue placeholder="Time Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="quarter">This Quarter</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="space-y-8">
+      <div className="flex items-center space-x-4">
+        <div className="p-3 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-600 shadow-lg">
+          <TrendingUp className="h-6 w-6 text-white" />
         </div>
-      </CardHeader>
+        <div>
+          <h2 className="text-2xl font-bold">Analytics & Insights</h2>
+          <p className="text-muted-foreground">
+            Data-driven insights to optimize team productivity
+          </p>
+        </div>
+      </div>
       
-      <CardContent className="pt-6">
-        <Tabs defaultValue="time" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="time">Time Tracking</TabsTrigger>
-            <TabsTrigger value="tasks">Task Distribution</TabsTrigger>
-            <TabsTrigger value="workload">Team Workload</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="time" className="space-y-4">
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <h4 className="text-sm font-medium">Hours Worked</h4>
-                <Badge variant="outline" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  Total: {timeTrackingData.reduce((acc, day) => acc + day.hours, 0).toFixed(1)}h
-                </Badge>
-              </div>
-              
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={timeTrackingData}>
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`${value} hours`, 'Time']} />
-                    <Bar dataKey="hours" fill="#8884d8" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+      <Card className="shadow-lg overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border-slate-200 dark:border-slate-700">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border-b border-slate-200 dark:border-slate-700/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center text-xl">
+                <BarChartIcon className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+                Performance Analytics
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Visualize data and optimize productivity
+              </CardDescription>
             </div>
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-[130px] h-8 bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700">
+                <SelectValue placeholder="Time Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="week">This Week</SelectItem>
+                <SelectItem value="month">This Month</SelectItem>
+                <SelectItem value="quarter">This Quarter</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="pt-6">
+          <Tabs defaultValue="time" className="w-full">
+            <TabsList className="grid grid-cols-3 mb-4 bg-slate-100 dark:bg-slate-800/80">
+              <TabsTrigger 
+                value="time" 
+                className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400"
+              >
+                Time Tracking
+              </TabsTrigger>
+              <TabsTrigger 
+                value="tasks"
+                className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400"
+              >
+                Task Distribution
+              </TabsTrigger>
+              <TabsTrigger 
+                value="workload"
+                className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400"
+              >
+                Team Workload
+              </TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium">Productivity Score</h4>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={productivityData}>
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip formatter={(value) => [`${value}%`, 'Score']} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="score" 
-                      stroke="#82ca9d" 
-                      strokeWidth={2} 
-                      dot={{ r: 4 }} 
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <p className="text-xs text-right text-gray-500">Productivity trending upward</p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="tasks" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2">Tasks by Category</h4>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={categoryData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value, name) => [`${value} tasks`, name]} />
-                    </PieChart>
-                  </ResponsiveContainer>
+            <TabsContent value="time" className="space-y-6 pt-2">
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="flex justify-between mb-4">
+                  <h4 className="text-lg font-medium flex items-center">
+                    <BarChartIcon className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
+                    Hours Worked
+                  </h4>
+                  <Badge className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 dark:from-purple-900/40 dark:to-indigo-900/40 dark:text-purple-200 border-purple-200 dark:border-purple-800/50">
+                    Total: {timeTrackingData.reduce((acc, day) => acc + day.hours, 0).toFixed(1)}h
+                  </Badge>
                 </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium mb-2">Completion Rate by Priority</h4>
+                
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      layout="vertical"
-                      data={[
-                        { priority: 'High', completed: 65, total: 100 },
-                        { priority: 'Medium', completed: 82, total: 100 },
-                        { priority: 'Low', completed: 93, total: 100 },
-                      ]}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis type="number" domain={[0, 100]} />
-                      <YAxis type="category" dataKey="priority" />
-                      <Tooltip formatter={(value) => [`${value}%`, 'Completion Rate']} />
-                      <Bar dataKey="completed" fill="#8884d8" radius={[0, 4, 4, 0]} />
+                    <BarChart data={timeTrackingData} margin={{ top: 0, right: 0, left: 0, bottom: 5 }}>
+                      <XAxis dataKey="day" axisLine={false} tickLine={false} />
+                      <YAxis axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        formatter={(value) => [`${value} hours`, 'Time']} 
+                        contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.8)", borderRadius: "8px", border: "1px solid #e2e8f0" }} 
+                      />
+                      <Bar 
+                        dataKey="hours" 
+                        radius={[4, 4, 0, 0]} 
+                        fill="url(#purpleGradient)" 
+                      />
+                      <defs>
+                        <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="#6d28d9" stopOpacity={0.5}/>
+                        </linearGradient>
+                      </defs>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
-            </div>
+              
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h4 className="text-lg font-medium flex items-center mb-4">
+                  <TrendingUp className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
+                  Productivity Score
+                </h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={productivityData} margin={{ top: 0, right: 0, left: 0, bottom: 5 }}>
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} />
+                      <YAxis domain={[0, 100]} axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        formatter={(value) => [`${value}%`, 'Score']} 
+                        contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.8)", borderRadius: "8px", border: "1px solid #e2e8f0" }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="score" 
+                        stroke="#10b981" 
+                        strokeWidth={3} 
+                        dot={{ r: 4, stroke: "#10b981", fill: "white", strokeWidth: 2 }} 
+                      />
+                      <defs>
+                        <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.5}/>
+                          <stop offset="100%" stopColor="#10b981" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <p className="text-xs text-right text-gray-500 pt-2">Productivity trending upward +6% this week</p>
+              </div>
+            </TabsContent>
             
-            <div>
-              <h4 className="text-sm font-medium mb-2">Task Velocity</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Average task completion time: <span className="font-medium">2.3 days</span>
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Fastest category: <span className="font-medium">Personal (1.4 days)</span>
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Slowest category: <span className="font-medium">Work (3.7 days)</span>
-              </p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="workload" className="space-y-4">
-            <h4 className="text-sm font-medium">Team Workload Heatmap</h4>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr>
-                    <th className="text-left font-medium px-2 py-1">Member</th>
-                    <th className="font-medium px-2 py-1">Mon</th>
-                    <th className="font-medium px-2 py-1">Tue</th>
-                    <th className="font-medium px-2 py-1">Wed</th>
-                    <th className="font-medium px-2 py-1">Thu</th>
-                    <th className="font-medium px-2 py-1">Fri</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {workloadData.map((row, i) => (
-                    <tr key={i}>
-                      <td className="px-2 py-1 font-medium">{row.name}</td>
-                      <td className={`px-2 py-1 text-center rounded ${formatWorkloadCell(row.Mon)}`}>{row.Mon}%</td>
-                      <td className={`px-2 py-1 text-center rounded ${formatWorkloadCell(row.Tue)}`}>{row.Tue}%</td>
-                      <td className={`px-2 py-1 text-center rounded ${formatWorkloadCell(row.Wed)}`}>{row.Wed}%</td>
-                      <td className={`px-2 py-1 text-center rounded ${formatWorkloadCell(row.Thu)}`}>{row.Thu}%</td>
-                      <td className={`px-2 py-1 text-center rounded ${formatWorkloadCell(row.Fri)}`}>{row.Fri}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TabsContent value="tasks" className="pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h4 className="text-lg font-medium flex items-center mb-4">
+                    <PieChartIcon className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
+                    Tasks by Category
+                  </h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {categoryData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value, name) => [`${value} tasks`, name]} 
+                          contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.8)", borderRadius: "8px", border: "1px solid #e2e8f0" }} 
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                
+                <div className="rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h4 className="text-lg font-medium flex items-center mb-4">
+                    <BarChartIcon className="h-4 w-4 mr-2 text-indigo-600 dark:text-indigo-400" />
+                    Completion Rate by Priority
+                  </h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        layout="vertical"
+                        data={[
+                          { priority: 'High', completed: 65, total: 100 },
+                          { priority: 'Medium', completed: 82, total: 100 },
+                          { priority: 'Low', completed: 93, total: 100 },
+                        ]}
+                        margin={{ top: 20, right: 5, left: 20, bottom: 5 }}
+                      >
+                        <XAxis type="number" domain={[0, 100]} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="priority" axisLine={false} tickLine={false} />
+                        <Tooltip formatter={(value) => [`${value}%`, 'Completion Rate']} />
+                        <Bar 
+                          dataKey="completed" 
+                          radius={[0, 4, 4, 0]}
+                        >
+                          {[
+                            <Cell key="high" fill="#ef4444" />,
+                            <Cell key="medium" fill="#f59e0b" />,
+                            <Cell key="low" fill="#10b981" />
+                          ]}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                
+                <div className="rounded-xl bg-gradient-to-r from-slate-50 to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/10 p-6 border border-slate-200 dark:border-slate-700 shadow-sm col-span-1 md:col-span-2">
+                  <h4 className="text-lg font-medium flex items-center mb-4">Task Velocity</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="bg-white dark:bg-slate-800/80 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                      <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Average completion</h5>
+                      <p className="text-2xl font-semibold text-indigo-600 dark:text-indigo-400">2.3 days</p>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800/80 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                      <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Fastest category</h5>
+                      <p className="text-2xl font-semibold text-green-600 dark:text-green-400">1.4 days</p>
+                      <span className="text-xs text-gray-500">(Personal tasks)</span>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800/80 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                      <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Slowest category</h5>
+                      <p className="text-2xl font-semibold text-amber-600 dark:text-amber-400">3.7 days</p>
+                      <span className="text-xs text-gray-500">(Work tasks)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
             
-            <div className="mt-4 rounded-md bg-gray-50 dark:bg-gray-900 p-3">
-              <h4 className="text-sm font-medium mb-1">Insights</h4>
-              <ul className="text-xs space-y-1 text-gray-600 dark:text-gray-400">
-                <li>• Your workload peaks on Wednesday (90%)</li>
-                <li>• Team average workload: 67%</li>
-                <li>• Consider redistributing tasks from Wednesday to Thursday</li>
-                <li>• Sarah has high variance in workload distribution</li>
-              </ul>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      
-      <CardFooter className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 flex justify-end">
-        Updated 5 minutes ago
-      </CardFooter>
-    </Card>
+            <TabsContent value="workload" className="pt-2">
+              <div className="rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h4 className="text-lg font-medium mb-4">Team Workload Heatmap</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr>
+                        <th className="text-left font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Member</th>
+                        <th className="font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Mon</th>
+                        <th className="font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Tue</th>
+                        <th className="font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Wed</th>
+                        <th className="font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Thu</th>
+                        <th className="font-medium px-3 py-2 border-b border-slate-200 dark:border-slate-700">Fri</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {workloadData.map((row, i) => (
+                        <tr key={i}>
+                          <td className="px-3 py-2 font-medium border-b border-slate-200 dark:border-slate-700">{row.name}</td>
+                          <td className={`px-3 py-2 text-center rounded-md m-1 ${formatWorkloadCell(row.Mon)}`}>{row.Mon}%</td>
+                          <td className={`px-3 py-2 text-center rounded-md m-1 ${formatWorkloadCell(row.Tue)}`}>{row.Tue}%</td>
+                          <td className={`px-3 py-2 text-center rounded-md m-1 ${formatWorkloadCell(row.Wed)}`}>{row.Wed}%</td>
+                          <td className={`px-3 py-2 text-center rounded-md m-1 ${formatWorkloadCell(row.Thu)}`}>{row.Thu}%</td>
+                          <td className={`px-3 py-2 text-center rounded-md m-1 ${formatWorkloadCell(row.Fri)}`}>{row.Fri}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <div className="mt-6 rounded-xl bg-gradient-to-r from-slate-50 to-purple-50/30 dark:from-slate-800 dark:to-purple-900/10 p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h4 className="text-lg font-medium mb-3">Insights</h4>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <li className="bg-white dark:bg-slate-800/80 px-4 py-3 rounded-lg text-sm flex items-center space-x-2 border border-slate-100 dark:border-slate-700">
+                    <span className="h-2 w-2 bg-red-500 rounded-full"></span>
+                    <span>Your workload peaks on Wednesday (90%)</span>
+                  </li>
+                  <li className="bg-white dark:bg-slate-800/80 px-4 py-3 rounded-lg text-sm flex items-center space-x-2 border border-slate-100 dark:border-slate-700">
+                    <span className="h-2 w-2 bg-blue-500 rounded-full"></span>
+                    <span>Team average workload: 67%</span>
+                  </li>
+                  <li className="bg-white dark:bg-slate-800/80 px-4 py-3 rounded-lg text-sm flex items-center space-x-2 border border-slate-100 dark:border-slate-700">
+                    <span className="h-2 w-2 bg-amber-500 rounded-full"></span>
+                    <span>Consider redistributing tasks from Wednesday to Thursday</span>
+                  </li>
+                  <li className="bg-white dark:bg-slate-800/80 px-4 py-3 rounded-lg text-sm flex items-center space-x-2 border border-slate-100 dark:border-slate-700">
+                    <span className="h-2 w-2 bg-purple-500 rounded-full"></span>
+                    <span>Sarah has high variance in workload distribution</span>
+                  </li>
+                </ul>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        
+        <CardFooter className="bg-slate-50 dark:bg-slate-800/80 text-xs text-gray-500 flex justify-end border-t border-slate-200 dark:border-slate-700/50 py-3">
+          Last updated: {new Date().toLocaleDateString()} • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 
