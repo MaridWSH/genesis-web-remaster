@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTeams } from '@/context/TeamContext';
 import { useAuth } from '@/context/AuthContext';
@@ -39,7 +38,9 @@ import {
   File, 
   Mail, 
   Shield, 
-  X 
+  X,
+  UserPlus,
+  Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -124,11 +125,11 @@ const TeamManagement = () => {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
       case 'editor':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:border-gray-700';
     }
   };
   
@@ -147,22 +148,22 @@ const TeamManagement = () => {
   };
   
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Team Collaboration</h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h2 className="text-2xl font-semibold">Team Management</h2>
+          <p className="text-muted-foreground">
             Create and manage teams to collaborate on tasks
           </p>
         </div>
-        <div className="flex space-x-2 mt-4 md:mt-0">
+        <div className="flex mt-4 md:mt-0">
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus size={16} className="mr-1" /> Create Team
+              <Button className="gap-1">
+                <Plus size={16} /> Create Team
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Create New Team</DialogTitle>
               </DialogHeader>
@@ -196,14 +197,16 @@ const TeamManagement = () => {
       </div>
       
       {teams.length === 0 ? (
-        <Card className="border border-dashed">
-          <CardContent className="pt-6 text-center">
+        <Card className="border border-dashed bg-muted/20">
+          <CardContent className="pt-10 pb-10 text-center">
             <div className="mb-4 flex justify-center">
-              <Users className="h-12 w-12 text-gray-400" />
+              <div className="rounded-full bg-primary/10 p-3">
+                <Users className="h-10 w-10 text-primary" />
+              </div>
             </div>
-            <h3 className="text-lg font-medium mb-2">No Teams Yet</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Create your first team to start collaborating on tasks
+            <h3 className="text-xl font-medium mb-2">No Teams Yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Create your first team to start collaborating on tasks with your colleagues
             </p>
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus size={16} className="mr-1" /> Create Team
@@ -212,8 +215,8 @@ const TeamManagement = () => {
         </Card>
       ) : (
         <>
-          <div className="mb-6">
-            <Label htmlFor="selectTeam">Select Team</Label>
+          <div className="bg-gradient-to-b from-primary/5 to-primary/10 rounded-xl border border-primary/20 p-6">
+            <Label htmlFor="selectTeam" className="text-sm font-medium mb-2 block">Select Active Team</Label>
             <Select 
               value={currentTeam?.id} 
               onValueChange={(value) => {
@@ -221,12 +224,12 @@ const TeamManagement = () => {
                 if (team) setCurrentTeam(team);
               }}
             >
-              <SelectTrigger id="selectTeam" className="w-full md:w-[300px]">
+              <SelectTrigger id="selectTeam" className="w-full md:w-[300px] bg-background">
                 <SelectValue placeholder="Select Team" />
               </SelectTrigger>
               <SelectContent>
                 {teams.map(team => (
-                  <SelectItem key={team.id} value={team.id}>
+                  <SelectItem key={team.id} value={team.id} className="flex items-center gap-2">
                     {team.name}
                   </SelectItem>
                 ))}
@@ -235,89 +238,99 @@ const TeamManagement = () => {
           </div>
           
           {currentTeam && (
-            <Tabs defaultValue="members" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-4">
-                <TabsTrigger value="members">
-                  <Users size={16} className="mr-1" /> Members
-                </TabsTrigger>
-                <TabsTrigger value="projects">
-                  <File size={16} className="mr-1" /> Projects
-                </TabsTrigger>
-                <TabsTrigger value="settings">
-                  <Settings size={16} className="mr-1" /> Settings
-                </TabsTrigger>
-              </TabsList>
+            <Card className="overflow-hidden border-border/80">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-muted/30 border-b border-border/50 gap-0">
+                <Tabs defaultValue="members" className="w-full">
+                  <TabsList className="bg-white/20 dark:bg-black/20 backdrop-blur">
+                    <TabsTrigger value="members" className="data-[state=active]:bg-background">
+                      <Users size={14} className="mr-1" /> Members
+                    </TabsTrigger>
+                    <TabsTrigger value="projects" className="data-[state=active]:bg-background">
+                      <File size={14} className="mr-1" /> Projects
+                    </TabsTrigger>
+                    <TabsTrigger value="settings" className="data-[state=active]:bg-background">
+                      <Settings size={14} className="mr-1" /> Settings
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="pt-6 px-2">
+                    <TabsContent value="members" className="mt-0">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium">Team Members</h3>
+                        {userHasPermission(currentTeam.id, 'admin') && (
+                          <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:text-primary hover:bg-primary/10">
+                                <UserPlus size={14} className="mr-1" /> Invite
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Invite Team Member</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="email">Email Address</Label>
+                                  <Input 
+                                    id="email" 
+                                    type="email"
+                                    value={inviteEmail}
+                                    onChange={(e) => setInviteEmail(e.target.value)}
+                                    placeholder="colleague@example.com"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="role">Role</Label>
+                                  <Select 
+                                    value={inviteRole} 
+                                    onValueChange={(value) => setInviteRole(value as 'editor' | 'viewer')}
+                                  >
+                                    <SelectTrigger id="role">
+                                      <SelectValue placeholder="Select role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="editor">Editor (can edit tasks)</SelectItem>
+                                      <SelectItem value="viewer">Viewer (read-only)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button onClick={handleInviteUser}>
+                                  Send Invitation
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </CardHeader>
               
-              <TabsContent value="members" className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-medium">Team Members</h2>
-                  {userHasPermission(currentTeam.id, 'admin') && (
-                    <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button size="sm">
-                          <Mail size={16} className="mr-1" /> Invite
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Invite Team Member</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input 
-                              id="email" 
-                              type="email"
-                              value={inviteEmail}
-                              onChange={(e) => setInviteEmail(e.target.value)}
-                              placeholder="colleague@example.com"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
-                            <Select 
-                              value={inviteRole} 
-                              onValueChange={(value) => setInviteRole(value as 'editor' | 'viewer')}
-                            >
-                              <SelectTrigger id="role">
-                                <SelectValue placeholder="Select role" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="editor">Editor (can edit tasks)</SelectItem>
-                                <SelectItem value="viewer">Viewer (read-only)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
-                            Cancel
-                          </Button>
-                          <Button onClick={handleInviteUser}>
-                            Send Invitation
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-                
-                <div className="space-y-3">
-                  {currentTeam.members.map(member => (
-                    <Card key={member.userId}>
-                      <CardContent className="p-4 flex items-center justify-between">
+              <CardContent className="p-0">
+                <TabsContent value="members" className="mt-0">
+                  <div className="divide-y divide-border">
+                    {currentTeam.members.map(member => (
+                      <div key={member.userId} className="flex items-center justify-between p-4 hover:bg-muted/10 transition-colors">
                         <div className="flex items-center space-x-3">
-                          <Avatar>
-                            <AvatarFallback>{getMemberInitials(member.userId)}</AvatarFallback>
+                          <Avatar className="border-2 border-primary/20">
+                            <AvatarFallback className="bg-primary/10 text-primary">
+                              {getMemberInitials(member.userId)}
+                            </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium">{getMemberName(member.userId)}</p>
                             <div className="flex items-center space-x-2 mt-1">
-                              <Badge variant="outline" className={getRoleColor(member.role)}>
+                              <Badge variant="outline" className={`${getRoleColor(member.role)} border`}>
                                 {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                               </Badge>
                               {member.userId === currentTeam.createdBy && (
-                                <Badge variant="outline" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
                                   <Shield size={12} className="mr-1" /> Owner
                                 </Badge>
                               )}
@@ -329,9 +342,9 @@ const TeamManagement = () => {
                           <div className="flex items-center space-x-2">
                             <Select 
                               value={member.role} 
-                              onValueChange={(value) => handleUpdateRole(member.userId, value as 'admin' | 'editor' | 'viewer')}
+                              onValueChange={(value) => updateMemberRole(member.userId, value as 'admin' | 'editor' | 'viewer')}
                             >
-                              <SelectTrigger className="w-[120px]">
+                              <SelectTrigger className="w-[120px] h-8">
                                 <SelectValue placeholder="Role" />
                               </SelectTrigger>
                               <SelectContent>
@@ -343,75 +356,85 @@ const TeamManagement = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleRemoveMember(member.userId)}
+                              onClick={() => removeMember(member.userId)}
+                              className="text-muted-foreground hover:text-destructive"
                             >
                               <X size={16} />
                             </Button>
                           </div>
                         )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="projects" className="space-y-4">
-                <h2 className="text-xl font-medium">Team Projects</h2>
-                <p className="text-gray-500 dark:text-gray-400">
-                  Projects feature coming soon...
-                </p>
-              </TabsContent>
-              
-              <TabsContent value="settings" className="space-y-4">
-                <h2 className="text-xl font-medium">Team Settings</h2>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
                 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Team Information</CardTitle>
-                    <CardDescription>Update your team's basic information</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="updateTeamName">Team Name</Label>
-                      <Input 
-                        id="updateTeamName" 
-                        value={currentTeam.name}
-                        onChange={(e) => updateTeam(currentTeam.id, { name: e.target.value })}
-                        disabled={!userHasPermission(currentTeam.id, 'admin')}
-                      />
+                <TabsContent value="projects" className="p-6 text-center">
+                  <div className="py-10">
+                    <div className="inline-flex rounded-full bg-primary/10 p-3 mb-4">
+                      <File className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="updateTeamDescription">Description</Label>
-                      <Input 
-                        id="updateTeamDescription" 
-                        value={currentTeam.description || ''}
-                        onChange={(e) => updateTeam(currentTeam.id, { description: e.target.value })}
-                        disabled={!userHasPermission(currentTeam.id, 'admin')}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                    <h3 className="text-lg font-medium">Team Projects</h3>
+                    <p className="text-muted-foreground mt-2 mb-4">
+                      Projects feature coming soon...
+                    </p>
+                    <Button variant="outline" disabled>Coming Soon</Button>
+                  </div>
+                </TabsContent>
                 
-                {userHasPermission(currentTeam.id, 'admin') && (
-                  <Card className="border-red-200 dark:border-red-800">
-                    <CardHeader>
-                      <CardTitle className="text-red-600 dark:text-red-400">Danger Zone</CardTitle>
-                      <CardDescription>
-                        Actions here cannot be undone
-                      </CardDescription>
+                <TabsContent value="settings" className="p-6 space-y-6">
+                  <h3 className="text-lg font-medium">Team Settings</h3>
+                  
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Team Information</CardTitle>
+                      <CardDescription>Update your team's basic information</CardDescription>
                     </CardHeader>
-                    <CardFooter>
-                      <Button 
-                        variant="destructive" 
-                        onClick={handleDeleteTeam}
-                      >
-                        Delete Team
-                      </Button>
-                    </CardFooter>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="updateTeamName">Team Name</Label>
+                        <Input 
+                          id="updateTeamName" 
+                          value={currentTeam.name}
+                          onChange={(e) => updateTeam(currentTeam.id, { name: e.target.value })}
+                          disabled={!userHasPermission(currentTeam.id, 'admin')}
+                          className="max-w-md"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="updateTeamDescription">Description</Label>
+                        <Input 
+                          id="updateTeamDescription" 
+                          value={currentTeam.description || ''}
+                          onChange={(e) => updateTeam(currentTeam.id, { description: e.target.value })}
+                          disabled={!userHasPermission(currentTeam.id, 'admin')}
+                          className="max-w-md"
+                        />
+                      </div>
+                    </CardContent>
                   </Card>
-                )}
-              </TabsContent>
-            </Tabs>
+                  
+                  {userHasPermission(currentTeam.id, 'admin') && (
+                    <Card className="border-red-200 dark:border-red-900/50">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base text-red-600 dark:text-red-400">Danger Zone</CardTitle>
+                        <CardDescription>
+                          Actions here cannot be undone
+                        </CardDescription>
+                      </CardHeader>
+                      <CardFooter>
+                        <Button 
+                          variant="destructive" 
+                          onClick={handleDeleteTeam}
+                          size="sm"
+                        >
+                          Delete Team
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  )}
+                </TabsContent>
+              </CardContent>
+            </Card>
           )}
         </>
       )}
