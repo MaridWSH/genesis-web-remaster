@@ -28,7 +28,12 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
         author: 'Me' // In a real app, this would be the current user's name
       });
       setCommentText('');
-      toast.success('Comment added');
+      
+      // Only show toast if it's not a temporary task
+      // (TaskContext will handle showing toast for temporary tasks)
+      if (!isTemporaryTask) {
+        toast.success('Comment added');
+      }
     }
   };
   
@@ -63,7 +68,11 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
       
       <div className="space-y-4 max-h-[250px] overflow-y-auto pr-2">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No comments yet</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+            {isTemporaryTask 
+              ? 'Comments can be added after saving the task' 
+              : 'No comments yet'}
+          </p>
         ) : (
           comments.map(comment => (
             <div key={comment.id} className="flex space-x-3">
@@ -74,7 +83,7 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">{comment.author}</p>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
                     </span>
                   </div>
@@ -112,8 +121,14 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           className="flex-1"
+          disabled={isTemporaryTask && !task}
         />
-        <Button type="submit" disabled={!commentText.trim()}>Add</Button>
+        <Button 
+          type="submit" 
+          disabled={!commentText.trim() || (isTemporaryTask && !task)}
+        >
+          Add
+        </Button>
       </form>
     </div>
   );

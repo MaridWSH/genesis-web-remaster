@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useTasks, Task, Priority, Category } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,14 @@ import { toast } from 'sonner';
 import TaskComments from './TaskComments';
 import TaskAttachments from './TaskAttachments';
 import TaskDependencies from './TaskDependencies';
+
 interface TaskDialogProps {
   mode: 'create' | 'edit';
   open: boolean;
   onOpenChange: (open: boolean) => void;
   taskId?: string;
 }
+
 const TaskDialog = ({
   mode,
   open,
@@ -59,7 +62,7 @@ const TaskDialog = ({
         // Set default values for new task
         setTitle('');
         setNotes('');
-        setDueDate('');
+        setDueDate(format(new Date(), 'yyyy-MM-dd')); // Set default to today
         setDueTime('');
         setPriority('Medium');
         setCategory('Work');
@@ -79,19 +82,24 @@ const TaskDialog = ({
       }
     }
   }, [mode, taskId, tasks, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!title) {
       toast.error('Please enter a task title');
       return;
     }
+    
     if (!dueDate) {
       toast.error('Please select a due date');
       return;
     }
+    
     const combinedDate = new Date(`${dueDate}T${dueTime || '00:00'}`);
+    
     if (mode === 'create') {
-      addTask({
+      const newTask = {
         title,
         notes,
         dueDate: combinedDate.toISOString(),
@@ -99,8 +107,11 @@ const TaskDialog = ({
         completed: false,
         category,
         recurring: recurring === 'none' ? undefined : recurring
-      });
+      };
+      
+      addTask(newTask);
       toast.success('Task created successfully');
+      onOpenChange(false);
     } else if (mode === 'edit' && taskId) {
       updateTask(taskId, {
         title,
@@ -111,9 +122,10 @@ const TaskDialog = ({
         recurring: recurring === 'none' ? undefined : recurring
       });
       toast.success('Task updated successfully');
+      onOpenChange(false);
     }
-    onOpenChange(false);
   };
+
   return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
@@ -214,8 +226,6 @@ const TaskDialog = ({
           </TabsContent>
         </Tabs>
         
-        
-        
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
@@ -227,4 +237,5 @@ const TaskDialog = ({
       </DialogContent>
     </Dialog>;
 };
+
 export default TaskDialog;

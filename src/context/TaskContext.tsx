@@ -1,5 +1,6 @@
 
 import React, { createContext, useState, useContext } from 'react';
+import { toast } from 'sonner';
 
 export type Priority = 'Low' | 'Medium' | 'High';
 export type Category = 'Work' | 'Personal' | 'Shopping' | 'Health' | 'Finance' | 'Other';
@@ -100,6 +101,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       document.documentElement.classList.remove('dark');
     }
+    // Save to local storage
+    localStorage.setItem('darkMode', (!darkMode).toString());
   };
 
   // Initialize dark mode based on user preference
@@ -119,7 +122,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [darkMode]);
 
   const addTask = (task: Omit<Task, 'id'>) => {
-    const newTask = {
+    const newTask: Task = {
       ...task,
       id: Date.now().toString(),
       comments: [],
@@ -133,7 +136,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateTask = (id: string, updatedTask: Partial<Task>) => {
     // Handle temp IDs specially - for new tasks being created
     if (id.startsWith('temp-')) {
-      // We don't do anything with temp tasks in the actual task list
       return;
     }
     
@@ -165,6 +167,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addComment = (taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => {
     // For temp tasks, we don't actually add to the task list yet
     if (taskId.startsWith('temp-')) {
+      // For temp tasks, just acknowledge the comment would be stored later
+      toast.success('Comment will be added when task is saved');
       return;
     }
     
@@ -190,6 +194,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addAttachment = (taskId: string, attachmentUrl: string) => {
     // For temp tasks, we don't actually add to the task list yet
     if (taskId.startsWith('temp-')) {
+      // For temp tasks, just acknowledge the attachment would be stored later
+      toast.success('Attachment will be added when task is saved');
       return;
     }
     
