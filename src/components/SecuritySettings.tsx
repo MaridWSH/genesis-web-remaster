@@ -335,7 +335,13 @@ const SecuritySettings = () => {
                     render={({ slots }) => (
                       <InputOTPGroup>
                         {slots.map((slot, index) => (
-                          <InputOTPSlot key={index} {...slot} />
+                          <InputOTPSlot 
+                            key={index} 
+                            index={index}
+                            char={slot.char}
+                            hasFakeCaret={slot.hasFakeCaret}
+                            isActive={slot.isActive}
+                          />
                         ))}
                       </InputOTPGroup>
                     )}
