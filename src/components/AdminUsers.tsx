@@ -24,15 +24,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { 
   Search, 
   MoreHorizontal, 
   Edit, 
   Trash, 
   ShieldCheck, 
-  Shield 
+  Shield,
+  UserPlus
 } from 'lucide-react';
 import { UserProfile } from '@/types';
+import { useToast } from "@/components/ui/use-toast";
 
 // Mock user data for demo purposes
 // In a real app, this would come from your backend API
@@ -82,33 +94,108 @@ const mockUsers: UserProfile[] = [
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>(mockUsers);
   const [searchQuery, setSearchQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: ""
+  });
+  const { toast } = useToast();
   
   // Filter users based on search query
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Add new user
+  const handleAddUser = () => {
+    // Validation
+    if (!newUser.name || !newUser.email) {
+      toast({
+        variant: "destructive",
+        title: "Invalid input",
+        description: "Name and email are required."
+      });
+      return;
+    }
+
+    // Check if email already exists
+    if (users.some(user => user.email === newUser.email)) {
+      toast({
+        variant: "destructive",
+        title: "Email already exists",
+        description: "Please use a different email address."
+      });
+      return;
+    }
+
+    // Generate a new unique ID (in a real app, the backend would do this)
+    const newId = (Math.max(...users.map(user => parseInt(user.id))) + 1).toString();
+    
+    // Create new user with default values
+    const userToAdd: UserProfile = {
+      id: newId,
+      name: newUser.name,
+      email: newUser.email,
+      memberSince: new Date().toISOString().split('T')[0],
+      streakDays: 0,
+      totalCompleted: 0
+    };
+    
+    // Add to users array
+    setUsers([...users, userToAdd]);
+    
+    // Reset form and close dialog
+    setNewUser({ name: "", email: "" });
+    setOpen(false);
+    
+    // Show success toast
+    toast({
+      title: "User added",
+      description: `${newUser.name} has been added successfully.`
+    });
+  };
   
   // Mock functions for user actions
   const handleDeleteUser = (userId: string) => {
     setUsers(users.filter(user => user.id !== userId));
     // In a real app, you would call an API endpoint
     console.log(`Delete user with ID: ${userId}`);
+    
+    toast({
+      title: "User deleted",
+      description: "The user has been removed successfully."
+    });
   };
   
   const handleEditUser = (userId: string) => {
     // In a real app, this would open a modal or navigate to an edit page
     console.log(`Edit user with ID: ${userId}`);
+    
+    toast({
+      title: "Edit user",
+      description: "This feature is not implemented yet."
+    });
   };
   
   const handleMakeAdmin = (userId: string) => {
     // In a real app, this would update the user's role
     console.log(`Make user ${userId} an admin`);
+    
+    toast({
+      title: "Role updated",
+      description: "User has been promoted to admin."
+    });
   };
   
   const handleRemoveAdmin = (userId: string) => {
     // In a real app, this would update the user's role
     console.log(`Remove admin privileges for user ${userId}`);
+    
+    toast({
+      title: "Role updated",
+      description: "Admin privileges have been removed."
+    });
   };
   
   return (
@@ -128,7 +215,51 @@ const AdminUsers = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button className="ml-2">Add User</Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="ml-2">
+                <UserPlus className="h-4 w-4 mr-1" />
+                Add User
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account. The user will receive a welcome email with instructions to set their password.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input 
+                    id="name" 
+                    className="col-span-3" 
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input 
+                    id="email" 
+                    type="email"
+                    className="col-span-3" 
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                <Button onClick={handleAddUser}>Add User</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
         
         <div className="rounded-md border">
