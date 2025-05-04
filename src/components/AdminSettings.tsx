@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -19,7 +19,7 @@ import {
   AccordionTrigger
 } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles } from "lucide-react";
+import AIIntegrationSettings from './AIIntegrationSettings';
 
 const AdminSettings = () => {
   const { toast } = useToast();
@@ -35,18 +35,15 @@ const AdminSettings = () => {
     maintenanceMode: false
   });
 
-  // DeepSeek API key state
-  const [apiKey, setApiKey] = useState('');
-  const [savedApiKey, setSavedApiKey] = useState('');
-
-  // Load saved API key on mount
-  useEffect(() => {
-    const key = localStorage.getItem('admin-deepseek-api-key');
-    if (key) {
-      setSavedApiKey(key);
-      setApiKey(key);
-    }
-  }, []);
+  const [defaultSettings] = useState({
+    siteName: "TaskMaster",
+    siteDescription: "The ultimate task management application",
+    allowRegistration: true,
+    requireEmailVerification: true,
+    taskLimit: "100",
+    teamLimit: "5",
+    maintenanceMode: false
+  });
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,21 +70,12 @@ const AdminSettings = () => {
     });
   };
 
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('admin-deepseek-api-key', apiKey);
-      setSavedApiKey(apiKey);
-      toast({
-        title: "API Key Saved",
-        description: "DeepSeek API key has been saved successfully for all users."
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Please enter a valid API key",
-        variant: "destructive"
-      });
-    }
+  const handleResetSettings = () => {
+    setSettings(defaultSettings);
+    toast({
+      title: "Settings Reset",
+      description: "Settings have been reset to default values."
+    });
   };
   
   return (
@@ -136,38 +124,8 @@ const AdminSettings = () => {
         </CardContent>
       </Card>
       
-      {/* AI Integration Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl flex items-center">
-            <Sparkles className="h-5 w-5 mr-2 text-purple-500" />
-            AI Integration
-          </CardTitle>
-          <CardDescription>Configure DeepSeek AI API for all users</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="deepseek-api-key">DeepSeek API Key</Label>
-              <Input
-                id="deepseek-api-key"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter DeepSeek API key"
-              />
-              {savedApiKey && (
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  API key is configured and available for all users
-                </p>
-              )}
-            </div>
-            <Button onClick={handleSaveApiKey} className="w-full md:w-auto">
-              Save API Key
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* AI Integration Settings - Now using the extracted component */}
+      <AIIntegrationSettings />
       
       {/* User Registration Settings */}
       <Card>
@@ -250,7 +208,9 @@ const AdminSettings = () => {
       </Accordion>
       
       <CardFooter className="flex justify-end border-t p-6">
-        <Button variant="outline" className="mr-2">Reset to Defaults</Button>
+        <Button variant="outline" className="mr-2" onClick={handleResetSettings}>
+          Reset to Defaults
+        </Button>
         <Button onClick={handleSaveSettings}>Save Settings</Button>
       </CardFooter>
     </div>

@@ -51,14 +51,12 @@ const getAdminApiKey = (): string => {
 
 export async function getAiSuggestion(
   prompt: string, 
-  apiKey: string = '', 
   model = DEEPSEEK_MODELS.DEEPSEEK_CHAT
 ): Promise<string> {
   try {
-    // Use admin API key if one isn't provided
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey) {
+    if (!apiKey) {
       throw new Error('DeepSeek API key is not configured');
     }
 
@@ -82,7 +80,7 @@ export async function getAiSuggestion(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${effectiveApiKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody)
     });
@@ -101,14 +99,14 @@ export async function getAiSuggestion(
   }
 }
 
+// Updated to remove the apiKey parameter since we only use the admin key now
 export async function getTaskOptimization(
-  tasks: { title: string; priority: string; dueDate: string }[],
-  apiKey: string = ''
+  tasks: { title: string; priority: string; dueDate: string }[]
 ): Promise<string[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey) {
+    if (!apiKey) {
       throw new Error('DeepSeek API key is not configured');
     }
 
@@ -118,7 +116,7 @@ export async function getTaskOptimization(
 
     const prompt = `Based on these tasks:\n${taskInfo}\n\nProvide 3 concise suggestions for optimizing task scheduling and prioritization. Focus on efficiency and workload balance.`;
 
-    const suggestion = await getAiSuggestion(prompt, effectiveApiKey);
+    const suggestion = await getAiSuggestion(prompt);
     
     // Parse the response into bullet points
     const suggestions = suggestion
@@ -134,14 +132,14 @@ export async function getTaskOptimization(
   }
 }
 
+// All the remaining functions are updated to remove the apiKey parameter
 export async function getSmartScheduleSuggestions(
-  tasks: Task[],
-  apiKey: string = ''
+  tasks: Task[]
 ): Promise<{ taskId: string; suggestion: string; suggestedTime?: string }[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey || tasks.length === 0) {
+    if (!apiKey || tasks.length === 0) {
       return [];
     }
 
@@ -163,7 +161,7 @@ export async function getSmartScheduleSuggestions(
     Format your response as one task per line, with the task ID at the beginning:
     [ID] - Scheduling suggestion | Reason`;
 
-    const response = await getAiSuggestion(prompt, effectiveApiKey);
+    const response = await getAiSuggestion(prompt);
     
     // Parse the response into task-specific suggestions
     return response
@@ -194,13 +192,12 @@ export async function getSmartScheduleSuggestions(
 }
 
 export async function getAutoPrioritySuggestions(
-  tasks: Task[],
-  apiKey: string = ''
+  tasks: Task[]
 ): Promise<{ taskId: string; suggestedPriority: Priority; reason: string }[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey || tasks.length === 0) {
+    if (!apiKey || tasks.length === 0) {
       return [];
     }
 
@@ -225,7 +222,7 @@ export async function getAutoPrioritySuggestions(
     Format your response for each task as:
     [ID] - Suggested Priority: (High/Medium/Low) | Reason: (brief explanation)`;
 
-    const response = await getAiSuggestion(prompt, effectiveApiKey);
+    const response = await getAiSuggestion(prompt);
     
     // Parse the response
     return response
@@ -255,13 +252,12 @@ export async function getAutoPrioritySuggestions(
 
 export async function generateSubtasks(
   taskTitle: string,
-  taskDescription: string,
-  apiKey: string = ''
+  taskDescription: string
 ): Promise<string[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey) {
+    if (!apiKey) {
       throw new Error('DeepSeek API key is not configured');
     }
 
@@ -272,7 +268,7 @@ export async function generateSubtasks(
     For each subtask, provide a clear, concise title that starts with an action verb.
     Format your response as a numbered list (1., 2., etc.).`;
 
-    const response = await getAiSuggestion(prompt, effectiveApiKey);
+    const response = await getAiSuggestion(prompt);
     
     // Parse the subtasks
     return response
@@ -287,13 +283,12 @@ export async function generateSubtasks(
 }
 
 export async function optimizeRecurringTasks(
-  recurringTasks: Task[],
-  apiKey: string = ''
+  recurringTasks: Task[]
 ): Promise<{ taskId: string; suggestion: string; suggestedFrequency?: string }[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey || recurringTasks.length === 0) {
+    if (!apiKey || recurringTasks.length === 0) {
       return [];
     }
 
@@ -319,7 +314,7 @@ export async function optimizeRecurringTasks(
     Format your response as:
     [ID] - Suggestion | Recommended frequency: (frequency)`;
 
-    const response = await getAiSuggestion(prompt, effectiveApiKey);
+    const response = await getAiSuggestion(prompt);
     
     // Parse the response
     return response
@@ -346,13 +341,12 @@ export async function optimizeRecurringTasks(
 
 export async function suggestTaskDelegation(
   tasks: Task[],
-  teamMembers: { userId: string; name: string; skills?: string[] }[],
-  apiKey: string = ''
+  teamMembers: { userId: string; name: string; skills?: string[] }[]
 ): Promise<{ taskId: string; suggestedUserId: string; reason: string }[]> {
   try {
-    const effectiveApiKey = apiKey || getAdminApiKey();
+    const apiKey = getAdminApiKey();
     
-    if (!effectiveApiKey || tasks.length === 0 || teamMembers.length === 0) {
+    if (!apiKey || tasks.length === 0 || teamMembers.length === 0) {
       return [];
     }
 
@@ -386,7 +380,7 @@ export async function suggestTaskDelegation(
     Format your response as:
     [Task ID] - Assign to: [Member ID] | Reason: (brief explanation)`;
 
-    const response = await getAiSuggestion(prompt, effectiveApiKey);
+    const response = await getAiSuggestion(prompt);
     
     // Parse the response
     return response

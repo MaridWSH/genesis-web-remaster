@@ -23,6 +23,7 @@ import Achievements from "./pages/Achievements";
 import Calendar from "./pages/Calendar";
 import Teams from "./pages/Teams";
 import AdminPage from "./pages/AdminPage";
+import AiPage from "./pages/AiPage";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +91,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <Teams />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/ai" 
+                      element={
+                        <ProtectedRoute>
+                          <AiPage />
                         </ProtectedRoute>
                       } 
                     />
