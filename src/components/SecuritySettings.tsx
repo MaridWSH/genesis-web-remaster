@@ -23,6 +23,11 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const SecuritySettings = () => {
   const { user, updatePassword } = useAuth();
@@ -39,6 +44,10 @@ const SecuritySettings = () => {
   // For 2FA setup
   const [showSetup2FA, setShowSetup2FA] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+  const [setupStep, setSetupStep] = useState<'qr' | 'verify'>('qr');
+  
+  // TOTP secret - in a real app this would be generated on the server
+  const totpSecret = 'JBSWY3DPEHPK3PXP'; // Example secret
   
   const handle2FAToggle = () => {
     if (twoFactorEnabled) {
@@ -48,18 +57,25 @@ const SecuritySettings = () => {
     } else {
       // Show 2FA setup dialog
       setShowSetup2FA(true);
+      setSetupStep('qr');
+      setVerificationCode('');
     }
   };
   
+  const handleNextStep = () => {
+    setSetupStep('verify');
+  };
+  
   const handleVerify2FA = () => {
-    // This would verify the code with a real backend
-    if (verificationCode === '123456') { // In a real app, this would be validated with the backend
+    // In a real app, this would verify the code with a backend
+    // For demo purposes, we'll accept any 6-digit code
+    if (verificationCode.length === 6) {
       setTwoFactorEnabled(true);
       setShowSetup2FA(false);
       setVerificationCode('');
       toast.success('Two-factor authentication enabled');
     } else {
-      toast.error('Invalid verification code');
+      toast.error('Please enter a valid 6-digit verification code');
     }
   };
   
@@ -117,6 +133,15 @@ const SecuritySettings = () => {
     document.body.removeChild(a);
     
     toast.success('Data exported successfully');
+  };
+  
+  const getTOTPQRCodeUrl = () => {
+    // In a real app, this would be generated on the server
+    // Generate URL for QR code (this follows the otpauth URL format)
+    const appName = 'TaskMaster';
+    const username = user?.email || 'user';
+    
+    return `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=otpauth://totp/${encodeURIComponent(appName)}:${encodeURIComponent(username)}?secret=${totpSecret}&issuer=${encodeURIComponent(appName)}`;
   };
   
   return (
@@ -257,42 +282,74 @@ const SecuritySettings = () => {
         </CardContent>
       </Card>
       
-      {/* 2FA Setup Dialog */}
+      {/* 2FA Setup Dialog with TOTP */}
       <Dialog open={showSetup2FA} onOpenChange={setShowSetup2FA}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Set Up Two-Factor Authentication</DialogTitle>
+            <DialogTitle>
+              {setupStep === 'qr' ? 'Set Up Two-Factor Authentication' : 'Verify Authentication'}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-md text-center">
-              <div className="mb-4">
-                {/* This would be a QR code in a real app */}
-                <div className="w-40 h-40 mx-auto bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                  <span className="text-xs">QR Code Placeholder</span>
+          
+          {setupStep === 'qr' ? (
+            <div className="space-y-4 py-4">
+              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                <div className="mb-4 flex justify-center">
+                  <img 
+                    src={getTOTPQRCodeUrl()} 
+                    alt="TOTP QR Code" 
+                    className="w-48 h-48 mx-auto" 
+                  />
+                </div>
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Scan this QR code with your authenticator app
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Or manually enter this setup key:
+                  </p>
+                  <p className="font-mono text-sm bg-gray-200 dark:bg-gray-700 p-2 rounded select-all">
+                    {totpSecret}
+                  </p>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Scan this QR code with your authenticator app or enter the code:
-              </p>
-              <p className="font-mono text-lg mt-2">ABCDEF123456</p>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowSetup2FA(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleNextStep}>Next</Button>
+              </DialogFooter>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="verificationCode">Verification Code</Label>
-              <Input 
-                id="verificationCode" 
-                placeholder="Enter 6-digit code"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-              />
+          ) : (
+            <div className="space-y-4 py-4">
+              <div className="space-y-4">
+                <p className="text-sm text-center">
+                  Enter the 6-digit verification code from your authenticator app
+                </p>
+                
+                <div className="flex justify-center py-4">
+                  <InputOTP 
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={setVerificationCode}
+                    render={({ slots }) => (
+                      <InputOTPGroup>
+                        {slots.map((slot, index) => (
+                          <InputOTPSlot key={index} index={index} />
+                        ))}
+                      </InputOTPGroup>
+                    )}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setSetupStep('qr')}>
+                  Back
+                </Button>
+                <Button onClick={handleVerify2FA}>Verify & Enable</Button>
+              </DialogFooter>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSetup2FA(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleVerify2FA}>Verify & Enable</Button>
-          </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
     </div>
