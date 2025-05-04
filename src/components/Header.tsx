@@ -3,6 +3,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  LayoutDashboard, 
+  Settings, 
+  User, 
+  Users, 
+  Award, 
+  Calendar, 
+  Shield, 
+  LogOut 
+} from 'lucide-react';
 
 const Header = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -24,14 +43,79 @@ const Header = () => {
             <Link to="/tasks" className="flex-shrink-0 flex items-center">
               <span className="text-primary text-xl font-medium">TaskMaster</span>
             </Link>
+            
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-4 items-center">
+              <Link to="/tasks" className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary">
+                Tasks
+              </Link>
+              <Link to="/features" className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary">
+                Features
+              </Link>
+            </div>
           </div>
           
           <div className="flex items-center">
-            <Link to="/profile" className="p-2 rounded-full hover:bg-accent">
-              <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                <AvatarFallback>{getInitials()}</AvatarFallback>
-              </Avatar>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="rounded-full h-8 w-8 p-0">
+                  <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                    <AvatarFallback>{getInitials()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/tasks" className="flex items-center cursor-pointer">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/features?tab=teams" className="flex items-center cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Teams</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/features?tab=achievements" className="flex items-center cursor-pointer">
+                    <Award className="mr-2 h-4 w-4" />
+                    <span>Achievements</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/features?tab=calendar" className="flex items-center cursor-pointer">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>Calendar</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/features?tab=security" className="flex items-center cursor-pointer">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Security</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="flex items-center cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

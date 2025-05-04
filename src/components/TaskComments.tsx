@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { ThumbsUp } from 'lucide-react';
+import { ThumbsUp, Reply, AlertTriangle } from 'lucide-react';
 
 interface TaskCommentsProps {
   taskId: string;
@@ -15,6 +15,7 @@ interface TaskCommentsProps {
 const TaskComments = ({ taskId }: TaskCommentsProps) => {
   const { tasks, addComment, updateTask } = useTasks();
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   
   const task = tasks.find(t => t.id === taskId);
   const comments = task?.comments || [];
@@ -23,11 +24,17 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (commentText.trim()) {
+      // Format for replies
+      const text = replyingTo 
+        ? `@${getCommentAuthor(replyingTo)} ${commentText}`
+        : commentText;
+        
       addComment(taskId, { 
-        text: commentText,
+        text,
         author: 'Me' // In a real app, this would be the current user's name
       });
       setCommentText('');
+      setReplyingTo(null);
       
       // Only show toast if it's not a temporary task
       // (TaskContext will handle showing toast for temporary tasks)
@@ -62,11 +69,28 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
     }
   };
   
+  const handleReportComment = (commentId: string) => {
+    toast.success('Comment reported to administrators');
+    // In a real app, this would send a report to administrators
+  };
+  
+  const handleReplyToComment = (commentId: string) => {
+    const comment = comments.find(c => c.id === commentId);
+    if (comment) {
+      setReplyingTo(commentId);
+    }
+  };
+  
+  const getCommentAuthor = (commentId: string): string => {
+    const comment = comments.find(c => c.id === commentId);
+    return comment?.author || '';
+  };
+  
   return (
     <div className="space-y-4">
       <h3 className="text-base font-medium">Comments</h3>
       
-      <div className="space-y-4 max-h-[250px] overflow-y-auto pr-2">
+      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
         {comments.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400 italic">
             {isTemporaryTask 
@@ -91,11 +115,29 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
+                      onClick={() => handleReplyToComment(comment.id)}
+                      className="h-6 p-1 flex items-center"
+                    >
+                      <Reply className="h-3 w-3 mr-1" />
+                      <span className="text-xs">Reply</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
                       onClick={() => handleLikeComment(comment.id)}
                       className="h-6 p-1 flex items-center"
                     >
                       <ThumbsUp className="h-3 w-3 mr-1" />
                       <span className="text-xs">{comment.likes || 0}</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleReportComment(comment.id)}
+                      className="h-6 p-1 flex items-center"
+                    >
+                      <AlertTriangle className="h-3 w-3" />
+                      <span className="sr-only">Report comment</span>
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -115,7 +157,20 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
         )}
       </div>
       
-      <form onSubmit={handleAddComment} className="flex space-x-2">
+      <form onSubmit={handleAddComment} className="space-y-2">
+        {replyingTo && (
+          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-2 bg-gray-100 dark:bg-gray-800 p-2 rounded">
+            <span>Replying to {getCommentAuthor(replyingTo)}</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setReplyingTo(null)}
+              className="h-5 w-5 p-0"
+            >
+              ✕
+            </Button>
+          </div>
+        )}
         <Input 
           placeholder="Write a comment..."
           value={commentText}
@@ -126,8 +181,9 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
         <Button 
           type="submit" 
           disabled={!commentText.trim() || (isTemporaryTask && !task)}
+          className="w-full"
         >
-          Add
+          {replyingTo ? 'Reply' : 'Add Comment'}
         </Button>
       </form>
     </div>

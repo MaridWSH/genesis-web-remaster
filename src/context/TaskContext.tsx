@@ -1,6 +1,6 @@
-
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'sonner';
+import { UserId, TeamId } from '@/types';
 
 export type Priority = 'Low' | 'Medium' | 'High';
 export type Category = 'Work' | 'Personal' | 'Shopping' | 'Health' | 'Finance' | 'Other';
@@ -18,6 +18,14 @@ export type Task = {
   comments?: Comment[];
   dependencies?: string[]; // IDs of tasks that this task depends on
   archived?: boolean;
+  // Collaboration features
+  assignedTo?: UserId;
+  createdBy?: UserId;
+  teamId?: TeamId;
+  isShared?: boolean;
+  // Gamification features
+  pointsValue?: number;
+  streakTask?: boolean;
 };
 
 type Comment = {
@@ -37,6 +45,11 @@ type TaskContextType = {
   archiveTask: (id: string) => void;
   addComment: (taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => void;
   addAttachment: (taskId: string, attachmentUrl: string) => void;
+  assignTask: (taskId: string, userId: UserId) => void;
+  shareTask: (taskId: string, teamId: TeamId) => void;
+  unshareTask: (taskId: string) => void;
+  getTeamTasks: (teamId: TeamId) => Task[];
+  getAssignedTasks: (userId: UserId) => Task[];
   darkMode: boolean;
   toggleDarkMode: () => void;
 };
@@ -129,6 +142,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       attachments: [],
       dependencies: [],
       archived: false,
+      // Default gamification values
+      pointsValue: task.priority === 'High' ? 10 : task.priority === 'Medium' ? 5 : 2
     };
     setTasks([...tasks, newTask]);
   };
@@ -212,6 +227,61 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  // New functions for collaboration features
+  const assignTask = (taskId: string, userId: UserId) => {
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            assignedTo: userId,
+          };
+        }
+        return task;
+      })
+    );
+    toast.success('Task assigned');
+  };
+
+  const shareTask = (taskId: string, teamId: TeamId) => {
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            teamId,
+            isShared: true,
+          };
+        }
+        return task;
+      })
+    );
+    toast.success('Task shared with team');
+  };
+
+  const unshareTask = (taskId: string) => {
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === taskId) {
+          const updatedTask = { ...task };
+          delete updatedTask.teamId;
+          updatedTask.isShared = false;
+          return updatedTask;
+        }
+        return task;
+      })
+    );
+    toast.success('Task is no longer shared');
+  };
+
+  const getTeamTasks = (teamId: TeamId) => {
+    return tasks.filter((task) => task.teamId === teamId);
+  };
+
+  const getAssignedTasks = (userId: UserId) => {
+    return tasks.filter((task) => task.assignedTo === userId);
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -223,6 +293,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         archiveTask,
         addComment,
         addAttachment,
+        assignTask,
+        shareTask,
+        unshareTask,
+        getTeamTasks,
+        getAssignedTasks,
         darkMode,
         toggleDarkMode,
       }}
