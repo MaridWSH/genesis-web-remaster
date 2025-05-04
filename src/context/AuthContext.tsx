@@ -14,6 +14,9 @@ type AuthContextType = {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  updateProfile: (data: Partial<User>) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,6 +66,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
   };
+  
+  const updateProfile = async (data: Partial<User>) => {
+    // In a real app, you would update this with your API
+    if (user) {
+      // Simulate successful profile update
+      setUser({
+        ...user,
+        ...data
+      });
+    } else {
+      throw new Error("User not authenticated");
+    }
+  };
+  
+  const resetPassword = async (email: string) => {
+    // In a real app, this would trigger a password reset email
+    // For demo purposes, we'll just simulate a delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return;
+  };
+  
+  const updatePassword = async (currentPassword: string, newPassword: string) => {
+    // In a real app, you would verify the current password and update to the new one
+    // For demo purposes, we'll just simulate a delay
+    if (currentPassword && newPassword) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return;
+    } else {
+      throw new Error("Please provide both current and new passwords");
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -72,6 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         isAuthenticated: !!user,
+        updateProfile,
+        resetPassword,
+        updatePassword,
       }}
     >
       {children}

@@ -1,85 +1,117 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const {
-    login
-  } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  
+  const { login } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
+
     try {
       await login(email, password);
-      navigate('/tasks');
       toast.success('Logged in successfully');
+      navigate('/tasks');
     } catch (error) {
-      toast.error('Invalid credentials. Please try again.');
+      toast.error('Login failed. Please check your credentials.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <Card className="max-w-md w-full mx-auto">
+    <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <h1 className="text-center text-2xl font-bold text-primary">TaskMaster</h1>
-        <p className="text-center text-muted-foreground">Enter your credentials to sign in</p>
+        <CardTitle className="text-2xl font-bold">Login</CardTitle>
+        <CardDescription>
+          Enter your email and password to access your account
+        </CardDescription>
       </CardHeader>
-      
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">Email</label>
-            <Input 
-              id="email" 
-              type="email" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
-              className="bg-background"
-              placeholder="your.email@example.com" 
-            />
+            <label htmlFor="email" className="text-sm font-medium">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="email"
+                placeholder="Enter your email"
+                type="email"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
           </div>
-          
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="text-sm font-medium">Password</label>
+              <label htmlFor="password" className="text-sm font-medium">
+                Password
+              </label>
+              <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                Forgot your password?
+              </Link>
             </div>
-            <Input 
-              id="password" 
-              type="password" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required
-              placeholder="••••••••" 
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-9 pr-10"
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
-          
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-            {isLoading ? 'Signing In...' : 'Sign In'}
+        </CardContent>
+        <CardFooter className="flex flex-col">
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </Button>
-        </form>
-      </CardContent>
-      
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-center text-muted-foreground">
-          Don't have an account? {" "}
-          <Link to="/register" className="text-primary hover:underline">
-            Create an account
-          </Link>
-        </p>
-      </CardFooter>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-primary hover:underline">
+              Register
+            </Link>
+          </div>
+        </CardFooter>
+      </form>
     </Card>
   );
 };

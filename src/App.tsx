@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import TasksPage from "./pages/TasksPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -18,15 +19,11 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Check if dark mode is preferred by the user's system
-  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  // Set initial dark mode class on the document
-  // Only apply dark mode if it's explicitly set to true in localStorage
+  // Set light mode as default unless dark mode is explicitly chosen
   if (localStorage.getItem('darkMode') === 'true') {
     document.documentElement.classList.add('dark');
   } else {
-    // Remove dark class if not explicitly set to true
+    // Remove dark class by default
     document.documentElement.classList.remove('dark');
   }
   
@@ -42,6 +39,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route 
                   path="/tasks" 
                   element={
