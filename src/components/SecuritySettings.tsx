@@ -335,7 +335,7 @@ const SecuritySettings = () => {
                     render={({ slots }) => (
                       <InputOTPGroup>
                         {slots.map((slot, index) => (
-                          <InputOTPSlot key={index} index={index} />
+                          <InputOTPSlot key={index} {...slot} />
                         ))}
                       </InputOTPGroup>
                     )}
