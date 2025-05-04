@@ -1,29 +1,22 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Save, Eye, EyeOff, Lock } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ProfilePage = () => {
-  const { user, logout, updateProfile, updatePassword } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   
   // Profile information state
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  
-  // Password change state
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [isSavingPassword, setIsSavingPassword] = useState(false);
   
   // Preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -61,29 +54,6 @@ const ProfilePage = () => {
     }
   };
   
-  const changePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    
-    setIsSavingPassword(true);
-    
-    try {
-      await updatePassword(currentPassword, newPassword);
-      toast.success('Password updated successfully');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error) {
-      toast.error('Failed to update password');
-    } finally {
-      setIsSavingPassword(false);
-    }
-  };
-  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -107,7 +77,6 @@ const ProfilePage = () => {
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="profile">Profile Information</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
         </TabsList>
         
@@ -148,84 +117,6 @@ const ProfilePage = () => {
                   <Button type="submit" className="w-full sm:w-auto" disabled={isSavingProfile}>
                     <Save className="mr-2 h-4 w-4" />
                     {isSavingProfile ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        {/* Security Tab */}
-        <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your password to keep your account secure</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={changePassword} className="space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="current-password" className="text-sm font-medium">Current Password</label>
-                    <div className="relative">
-                      <Input
-                        id="current-password"
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      >
-                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="new-password" className="text-sm font-medium">New Password</label>
-                    <div className="relative">
-                      <Input
-                        id="new-password"
-                        type={showNewPassword ? "text" : "password"}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="confirm-password" className="text-sm font-medium">Confirm New Password</label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full sm:w-auto"
-                    disabled={isSavingPassword || !currentPassword || !newPassword || !confirmPassword}
-                  >
-                    <Lock className="mr-2 h-4 w-4" />
-                    {isSavingPassword ? 'Updating...' : 'Update Password'}
                   </Button>
                 </div>
               </form>

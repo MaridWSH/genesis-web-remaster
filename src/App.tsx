@@ -17,6 +17,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import TasksPage from "./pages/TasksPage";
 import Features from "./pages/Features";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <Profile />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/settings" 
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
                         </ProtectedRoute>
                       } 
                     />

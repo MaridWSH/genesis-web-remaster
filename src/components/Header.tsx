@@ -90,12 +90,6 @@ const Header = () => {
                     <span>Calendar</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/features?tab=security" className="flex items-center cursor-pointer">
-                    <Shield className="mr-2 h-4 w-4" />
-                    <span>Security</span>
-                  </Link>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center cursor-pointer">
