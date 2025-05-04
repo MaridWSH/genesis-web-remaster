@@ -469,13 +469,13 @@ const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive, onQui
       </div>
       
       <div className="flex space-x-2">
-        {/* Quick View Button */}
+        {/* Quick View Button - Updated Style */}
         {(hasComments || hasAttachments || hasDependencies) && (
           <Button 
             size="sm" 
             variant="outline"
             onClick={() => onQuickView(task.id)}
-            className="text-gray-700 dark:text-gray-300"
+            className="bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary"
           >
             <Eye size={16} />
           </Button>
