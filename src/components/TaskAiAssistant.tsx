@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '@/context/TaskContext';
 import { 
@@ -62,8 +61,7 @@ const TaskAiAssistant: React.FC = () => {
     setLoading(true);
     try {
       const incompleteTasks = getIncompleteTasks();
-      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
-      const suggestions = await getTaskOptimization(incompleteTasks, adminApiKey);
+      const suggestions = await getTaskOptimization(incompleteTasks);
       setAiSuggestions(suggestions);
       toast.success("AI suggestions generated");
     } catch (error) {
@@ -93,8 +91,7 @@ const TaskAiAssistant: React.FC = () => {
     
     setLoading(true);
     try {
-      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
-      const generatedSubtasks = await generateSubtasks(task.title, task.notes, adminApiKey);
+      const generatedSubtasks = await generateSubtasks(task.title, task.notes);
       setSubtasks(generatedSubtasks);
       toast.success("Subtasks generated successfully");
     } catch (error) {
@@ -114,8 +111,7 @@ const TaskAiAssistant: React.FC = () => {
     setLoading(true);
     try {
       const incompleteTasks = getIncompleteTasks();
-      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
-      const suggestions = await getAutoPrioritySuggestions(incompleteTasks, adminApiKey);
+      const suggestions = await getAutoPrioritySuggestions(incompleteTasks);
       setPrioritySuggestions(suggestions);
       toast.success("Priority suggestions generated");
     } catch (error) {

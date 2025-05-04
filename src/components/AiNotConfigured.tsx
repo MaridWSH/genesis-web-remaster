@@ -23,7 +23,7 @@ const AiNotConfigured = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Alert variant="warning">
+        <Alert>
           <AlertTitle>DeepSeek API Key Not Configured</AlertTitle>
           <AlertDescription>
             An administrator needs to set up the DeepSeek API key in the admin settings before AI features can be used.
