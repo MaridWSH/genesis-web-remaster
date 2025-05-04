@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTasks, Task, Category } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,8 @@ import {
   CalendarIcon, 
   Tag,
   Moon,
-  Sun
+  Sun,
+  Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
 import TaskDialog from './TaskDialog';
@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import TaskQuickView from './TaskQuickView';
 
 type FilterType = 'All' | 'Active' | 'Completed' | 'Archived';
 type SortType = 'dueDate' | 'priority' | 'alphabetical';
@@ -51,6 +52,7 @@ const TaskList = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [quickViewTaskId, setQuickViewTaskId] = useState<string | null>(null);
 
   const handleAddTask = () => {
     setDialogMode('create');
@@ -72,9 +74,15 @@ const TaskList = () => {
     setShowCalendar(!showCalendar);
   };
 
-  // Filter and sort the tasks based on current filters
+  const handleOpenQuickView = (taskId: string) => {
+    setQuickViewTaskId(taskId);
+  };
+
+  const handleCloseQuickView = () => {
+    setQuickViewTaskId(null);
+  };
+
   const filteredAndSortedTasks = tasks
-    // First filter by completion status
     .filter((task) => {
       if (filterType === 'All') return !task.archived;
       if (filterType === 'Active') return !task.completed && !task.archived;
@@ -82,16 +90,13 @@ const TaskList = () => {
       if (filterType === 'Archived') return task.archived;
       return true;
     })
-    // Then filter by category
     .filter((task) => {
       if (categoryFilter === 'All') return true;
       return task.category === categoryFilter;
     })
-    // Then filter by search text
     .filter((task) => 
       task.title.toLowerCase().includes(searchText.toLowerCase())
     )
-    // Then filter by selected date if any
     .filter((task) => {
       if (!selectedDate) return true;
       const taskDate = new Date(task.dueDate);
@@ -101,7 +106,6 @@ const TaskList = () => {
         taskDate.getDate() === selectedDate.getDate()
       );
     })
-    // Finally sort the tasks
     .sort((a, b) => {
       const modifier = sortDirection === 'asc' ? 1 : -1;
       
@@ -121,10 +125,8 @@ const TaskList = () => {
       return 0;
     });
 
-  // Get all used categories from tasks
   const categories = Array.from(new Set(tasks.map(task => task.category).filter(Boolean))) as Category[];
   
-  // Tasks with upcoming due dates for calendar view
   const tasksWithDueDates = tasks
     .filter(task => !task.archived)
     .reduce((acc, task) => {
@@ -142,6 +144,8 @@ const TaskList = () => {
   const toggleSort = () => {
     setSortDirection(current => current === 'asc' ? 'desc' : 'asc');
   };
+
+  const quickViewTask = quickViewTaskId ? tasks.find(task => task.id === quickViewTaskId) : null;
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -298,6 +302,7 @@ const TaskList = () => {
                   onDelete={deleteTask}
                   onEdit={handleEditTask}
                   onArchive={handleArchiveTask}
+                  onQuickView={handleOpenQuickView}
                 />
               ))}
             </div>
@@ -319,6 +324,7 @@ const TaskList = () => {
                   onDelete={deleteTask}
                   onEdit={handleEditTask}
                   onArchive={handleArchiveTask}
+                  onQuickView={handleOpenQuickView}
                 />
               ))}
             </div>
@@ -332,6 +338,11 @@ const TaskList = () => {
         onOpenChange={setDialogOpen}
         taskId={selectedTaskId}
       />
+
+      {/* Render the quick view component if a task is selected */}
+      {quickViewTask && (
+        <TaskQuickView task={quickViewTask} onClose={handleCloseQuickView} />
+      )}
     </div>
   );
 };
@@ -342,9 +353,14 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
   onArchive: (id: string) => void;
+  onQuickView: (id: string) => void;
 }
 
-const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive }: TaskItemProps) => {
+const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive, onQuickView }: TaskItemProps) => {
+  const hasComments = task.comments && task.comments.length > 0;
+  const hasAttachments = task.attachments && task.attachments.length > 0;
+  const hasDependencies = task.dependencies && task.dependencies.length > 0;
+  
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'High':
@@ -424,11 +440,46 @@ const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive }: Tas
                 </span>
               </>
             )}
+            
+            {/* Indicators for comments, attachments, and links */}
+            {(hasComments || hasAttachments || hasDependencies) && (
+              <>
+                <span>•</span>
+                <span className="flex space-x-1">
+                  {hasComments && (
+                    <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-1 py-0">
+                      {task.comments?.length}c
+                    </Badge>
+                  )}
+                  {hasAttachments && (
+                    <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-1 py-0">
+                      {task.attachments?.length}f
+                    </Badge>
+                  )}
+                  {hasDependencies && (
+                    <Badge variant="outline" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 px-1 py-0">
+                      {task.dependencies?.length}l
+                    </Badge>
+                  )}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
       
       <div className="flex space-x-2">
+        {/* Quick View Button */}
+        {(hasComments || hasAttachments || hasDependencies) && (
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => onQuickView(task.id)}
+            className="text-gray-700 dark:text-gray-300"
+          >
+            <Eye size={16} />
+          </Button>
+        )}
         <Button 
           size="sm" 
           variant="outline"
