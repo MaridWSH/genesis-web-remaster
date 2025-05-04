@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -71,7 +70,7 @@ const App = () => {
                       path="/achievements" 
                       element={
                         <ProtectedRoute>
-                          <Features defaultTab="achievements" />
+                          <Achievements />
                         </ProtectedRoute>
                       } 
                     />
@@ -79,7 +78,7 @@ const App = () => {
                       path="/calendar" 
                       element={
                         <ProtectedRoute>
-                          <Features defaultTab="calendar" />
+                          <Calendar />
                         </ProtectedRoute>
                       } 
                     />
