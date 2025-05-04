@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useTasks, Task } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Check, Pencil, Trash2, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import TaskDialog from './TaskDialog';
 
 type FilterType = 'All' | 'Active' | 'Completed';
 
@@ -13,6 +12,21 @@ const TaskList = () => {
   const { tasks, toggleTaskCompletion, deleteTask } = useTasks();
   const [filterType, setFilterType] = useState<FilterType>('All');
   const [searchText, setSearchText] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
+
+  const handleAddTask = () => {
+    setDialogMode('create');
+    setSelectedTaskId(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleEditTask = (taskId: string) => {
+    setDialogMode('edit');
+    setSelectedTaskId(taskId);
+    setDialogOpen(true);
+  };
 
   const filteredTasks = tasks
     .filter((task) => {
@@ -32,11 +46,12 @@ const TaskList = () => {
           <h1 className="text-2xl font-semibold mb-2">Your Tasks</h1>
           <p className="text-gray-600">Manage your tasks and stay productive</p>
         </div>
-        <Link to="/tasks/new">
-          <Button className="bg-primary hover:bg-primary/90 mt-4 md:mt-0">
-            <Plus size={20} className="mr-1" /> Add Task
-          </Button>
-        </Link>
+        <Button 
+          className="bg-primary hover:bg-primary/90 mt-4 md:mt-0"
+          onClick={handleAddTask}
+        >
+          <Plus size={20} className="mr-1" /> Add Task
+        </Button>
       </div>
 
       <div className="mb-6">
@@ -78,10 +93,18 @@ const TaskList = () => {
               task={task} 
               onToggleCompletion={toggleTaskCompletion}
               onDelete={deleteTask}
+              onEdit={handleEditTask}
             />
           ))}
         </div>
       )}
+
+      <TaskDialog 
+        mode={dialogMode}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        taskId={selectedTaskId}
+      />
     </div>
   );
 };
@@ -90,9 +113,10 @@ interface TaskItemProps {
   task: Task;
   onToggleCompletion: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
-const TaskItem = ({ task, onToggleCompletion, onDelete }: TaskItemProps) => {
+const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit }: TaskItemProps) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'High':
@@ -131,11 +155,13 @@ const TaskItem = ({ task, onToggleCompletion, onDelete }: TaskItemProps) => {
       </div>
       
       <div className="flex space-x-2">
-        <Link to={`/tasks/edit/${task.id}`}>
-          <Button size="sm" variant="outline">
-            <Pencil size={16} />
-          </Button>
-        </Link>
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={() => onEdit(task.id)}
+        >
+          <Pencil size={16} />
+        </Button>
         <Button 
           size="sm" 
           variant="outline" 

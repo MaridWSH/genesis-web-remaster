@@ -12,8 +12,6 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import TasksPage from "./pages/TasksPage";
-import CreateTask from "./pages/CreateTask";
-import EditTask from "./pages/EditTask";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -36,22 +34,6 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <TasksPage />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/tasks/new" 
-                element={
-                  <ProtectedRoute>
-                    <CreateTask />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/tasks/edit/:taskId" 
-                element={
-                  <ProtectedRoute>
-                    <EditTask />
                   </ProtectedRoute>
                 } 
               />
