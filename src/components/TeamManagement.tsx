@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTeams } from '@/context/TeamContext';
 import { useAuth } from '@/context/AuthContext';
@@ -342,7 +343,7 @@ const TeamManagement = () => {
                           <div className="flex items-center space-x-2">
                             <Select 
                               value={member.role} 
-                              onValueChange={(value) => updateMemberRole(member.userId, value as 'admin' | 'editor' | 'viewer')}
+                              onValueChange={(value) => handleUpdateRole(member.userId, value as 'admin' | 'editor' | 'viewer')}
                             >
                               <SelectTrigger className="w-[120px] h-8">
                                 <SelectValue placeholder="Role" />
@@ -356,7 +357,7 @@ const TeamManagement = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => removeMember(member.userId)}
+                              onClick={() => handleRemoveMember(member.userId)}
                               className="text-muted-foreground hover:text-destructive"
                             >
                               <X size={16} />

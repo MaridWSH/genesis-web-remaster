@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTeams } from '@/context/TeamContext';
 import { useAuth } from '@/context/AuthContext';
@@ -321,16 +320,18 @@ const AdvancedTeamCollaboration: React.FC = () => {
                       <label htmlFor="guest-access" className="text-sm font-medium">
                         Access Level
                       </label>
-                      <Select value={guestAccess} onValueChange={setGuestAccess} className="max-w-md">
-                        <SelectTrigger id="guest-access">
-                          <SelectValue placeholder="Select access level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="view">View Only</SelectItem>
-                          <SelectItem value="comment">Can Comment</SelectItem>
-                          <SelectItem value="edit">Can Edit</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="max-w-md">
+                        <Select value={guestAccess} onValueChange={setGuestAccess}>
+                          <SelectTrigger id="guest-access">
+                            <SelectValue placeholder="Select access level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="view">View Only</SelectItem>
+                            <SelectItem value="comment">Can Comment</SelectItem>
+                            <SelectItem value="edit">Can Edit</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     
                     <Button onClick={inviteGuest} className="mt-2">
