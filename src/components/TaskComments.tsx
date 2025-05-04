@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 interface TaskCommentsProps {
   taskId: string;
 }
 
 const TaskComments = ({ taskId }: TaskCommentsProps) => {
-  const { tasks, addComment } = useTasks();
+  const { tasks, addComment, updateTask } = useTasks();
   const [commentText, setCommentText] = useState('');
   
   const task = tasks.find(t => t.id === taskId);
@@ -25,6 +26,15 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
         author: 'Me' // In a real app, this would be the current user's name
       });
       setCommentText('');
+      toast.success('Comment added');
+    }
+  };
+  
+  const handleDeleteComment = (commentId: string) => {
+    if (task) {
+      const updatedComments = comments.filter(comment => comment.id !== commentId);
+      updateTask(taskId, { comments: updatedComments });
+      toast.success('Comment deleted');
     }
   };
   
@@ -42,11 +52,22 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
                 <AvatarFallback>{comment.author[0]}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm font-medium">{comment.author}</p>
-                  <span className="text-xs text-gray-500">
-                    {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium">{comment.author}</p>
+                    <span className="text-xs text-gray-500">
+                      {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
+                    </span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDeleteComment(comment.id)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <span className="sr-only">Delete comment</span>
+                    ✕
+                  </Button>
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{comment.text}</p>
               </div>

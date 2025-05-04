@@ -11,7 +11,7 @@ interface TaskAttachmentsProps {
 }
 
 const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
-  const { tasks, addAttachment } = useTasks();
+  const { tasks, addAttachment, updateTask } = useTasks();
   const [attachmentUrl, setAttachmentUrl] = useState('');
   
   const task = tasks.find(t => t.id === taskId);
@@ -38,6 +38,15 @@ const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
       addAttachment(taskId, `${file.name}|${url}`);
       toast.success(`Uploaded ${file.name}`);
       e.target.value = ''; // Reset input
+    }
+  };
+  
+  const handleDeleteAttachment = (index: number) => {
+    if (task) {
+      const updatedAttachments = [...attachments];
+      updatedAttachments.splice(index, 1);
+      updateTask(taskId, { attachments: updatedAttachments });
+      toast.success('Attachment removed');
     }
   };
   
@@ -83,7 +92,11 @@ const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
                   {getAttachmentName(attachment)}
                 </a>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleDeleteAttachment(index)}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>

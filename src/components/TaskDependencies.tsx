@@ -4,6 +4,7 @@ import { useTasks } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface TaskDependenciesProps {
   taskId: string;
@@ -26,6 +27,7 @@ const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
         dependencies: [...dependencies, selectedTaskId]
       });
       setSelectedTaskId('');
+      toast.success('Task linked');
     }
   };
   
@@ -34,6 +36,7 @@ const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
       updateTask(taskId, {
         dependencies: dependencies.filter(id => id !== dependencyId)
       });
+      toast.success('Link removed');
     }
   };
   
@@ -53,7 +56,11 @@ const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
                   <Link className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   <span className="text-sm">{dependentTask.title}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => handleRemoveDependency(dependencyId)}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleRemoveDependency(dependencyId)}
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
