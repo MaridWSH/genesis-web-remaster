@@ -1,9 +1,12 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,6 +15,7 @@ const LoginForm = () => {
     login
   } = useAuth();
   const navigate = useNavigate();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,29 +29,59 @@ const LoginForm = () => {
       setIsLoading(false);
     }
   };
-  return <div className="max-w-md w-full mx-auto bg-white p-8 rounded-md shadow-md">
-      <h1 className="text-center text-2xl font-medium text-primary mb-4">TaskMaster</h1>
-      <h2 className="text-center text-xl font-medium mb-6">Sign in to your account</h2>
+  
+  return (
+    <Card className="max-w-md w-full mx-auto">
+      <CardHeader className="space-y-1">
+        <h1 className="text-center text-2xl font-bold text-primary">TaskMaster</h1>
+        <p className="text-center text-muted-foreground">Enter your credentials to sign in</p>
+      </CardHeader>
       
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block mb-2">Email</label>
-          <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="bg-slate-50" />
-        </div>
-        
-        <div className="mb-6">
-          <label htmlFor="password" className="block mb-2">Password</label>
-          <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-        </div>
-        
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-          {isLoading ? 'Signing In...' : 'Sign In'}
-        </Button>
-      </form>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium">Email</label>
+            <Input 
+              id="email" 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              required 
+              className="bg-background"
+              placeholder="your.email@example.com" 
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="text-sm font-medium">Password</label>
+            </div>
+            <Input 
+              id="password" 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required
+              placeholder="••••••••" 
+            />
+          </div>
+          
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
+            {isLoading ? 'Signing In...' : 'Sign In'}
+          </Button>
+        </form>
+      </CardContent>
       
-      <div className="text-center mt-4">
-        Don't have an account? <Link to="/register" className="text-primary">Create an account</Link>
-      </div>
-    </div>;
+      <CardFooter className="flex justify-center">
+        <p className="text-sm text-center text-muted-foreground">
+          Don't have an account? {" "}
+          <Link to="/register" className="text-primary hover:underline">
+            Create an account
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+  );
 };
+
 export default LoginForm;
