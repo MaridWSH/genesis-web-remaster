@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, Settings, User, Users, Award, Calendar, LogOut } from 'lucide-react';
+import { LayoutDashboard, Settings, User, Users, Award, Calendar, LogOut, Shield } from 'lucide-react';
 
 const Header = () => {
   const {
@@ -23,6 +23,9 @@ const Header = () => {
     return names.map(name => name[0]).join('').toUpperCase();
   };
 
+  // Check if user is admin (for demo purposes, only user with id "1" is admin)
+  const isAdmin = user?.id === "1";
+
   return <header className="bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
@@ -38,6 +41,14 @@ const Header = () => {
           </div>
           
           <div className="flex items-center">
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="outline" size="sm" className="mr-4">
+                  <Shield className="h-4 w-4 mr-1" />
+                  Admin
+                </Button>
+              </Link>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="rounded-full h-8 w-8 p-0">
@@ -73,6 +84,14 @@ const Header = () => {
                     <span>Calendar</span>
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="flex items-center cursor-pointer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Admin Panel</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center cursor-pointer">

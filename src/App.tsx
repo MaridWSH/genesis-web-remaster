@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import Achievements from "./pages/Achievements";
 import Calendar from "./pages/Calendar";
 import Teams from "./pages/Teams";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <Settings />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/admin" 
+                      element={
+                        <ProtectedRoute>
+                          <AdminPage />
                         </ProtectedRoute>
                       } 
                     />
