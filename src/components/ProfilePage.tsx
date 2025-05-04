@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -28,10 +27,24 @@ const ProfilePage = () => {
   
   // Preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => 
+    localStorage.getItem('darkMode') === 'true'
+  );
   
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
+  };
+  
+  const toggleDarkMode = (checked: boolean) => {
+    if (checked) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+    setIsDarkMode(checked);
   };
   
   const saveProfile = async (e: React.FormEvent) => {
@@ -246,16 +259,8 @@ const ProfilePage = () => {
                     <p className="text-muted-foreground text-sm">Toggle between light and dark theme</p>
                   </div>
                   <Switch 
-                    checked={document.documentElement.classList.contains('dark')}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('darkMode', 'true');
-                      } else {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('darkMode', 'false');
-                      }
-                    }}
+                    checked={isDarkMode}
+                    onCheckedChange={toggleDarkMode}
                   />
                 </div>
               </div>

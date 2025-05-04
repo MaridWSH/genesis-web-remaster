@@ -19,12 +19,15 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Set light mode as default unless dark mode is explicitly chosen
+  // Only apply dark mode if it has been explicitly set to true
+  // Default to light mode
   if (localStorage.getItem('darkMode') === 'true') {
     document.documentElement.classList.add('dark');
   } else {
     // Remove dark class by default
     document.documentElement.classList.remove('dark');
+    // Ensure we have the setting saved
+    localStorage.setItem('darkMode', 'false');
   }
   
   return (
