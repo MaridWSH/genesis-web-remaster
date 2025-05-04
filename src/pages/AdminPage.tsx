@@ -6,7 +6,8 @@ import Header from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminUsers from '@/components/AdminUsers';
 import AdminSettings from '@/components/AdminSettings';
-import { Shield } from 'lucide-react';
+import AdminAnalytics from '@/components/AdminAnalytics';
+import { Shield, Users, Settings, Activity } from 'lucide-react';
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -30,12 +31,25 @@ const AdminPage = () => {
         </div>
         
         <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="settings">Website Settings</TabsTrigger>
+          <TabsList className="grid w-full max-w-md grid-cols-3">
+            <TabsTrigger value="users" className="flex items-center gap-1">
+              <Users className="h-4 w-4" />
+              <span>Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1">
+              <Activity className="h-4 w-4" />
+              <span>Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-1">
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="users" className="mt-6">
             <AdminUsers />
+          </TabsContent>
+          <TabsContent value="analytics" className="mt-6">
+            <AdminAnalytics />
           </TabsContent>
           <TabsContent value="settings" className="mt-6">
             <AdminSettings />
