@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { ThumbsUp } from 'lucide-react';
 
 interface TaskCommentsProps {
   taskId: string;
@@ -17,6 +18,7 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
   
   const task = tasks.find(t => t.id === taskId);
   const comments = task?.comments || [];
+  const isTemporaryTask = taskId.startsWith('temp-');
   
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +37,23 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
       const updatedComments = comments.filter(comment => comment.id !== commentId);
       updateTask(taskId, { comments: updatedComments });
       toast.success('Comment deleted');
+    }
+  };
+  
+  const handleLikeComment = (commentId: string) => {
+    if (task) {
+      const updatedComments = comments.map(comment => {
+        if (comment.id === commentId) {
+          return { 
+            ...comment, 
+            likes: (comment.likes || 0) + 1 
+          };
+        }
+        return comment;
+      });
+      
+      updateTask(taskId, { comments: updatedComments });
+      toast.success('Comment liked');
     }
   };
   
@@ -59,15 +78,26 @@ const TaskComments = ({ taskId }: TaskCommentsProps) => {
                       {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
                     </span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleDeleteComment(comment.id)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <span className="sr-only">Delete comment</span>
-                    ✕
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleLikeComment(comment.id)}
+                      className="h-6 p-1 flex items-center"
+                    >
+                      <ThumbsUp className="h-3 w-3 mr-1" />
+                      <span className="text-xs">{comment.likes || 0}</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="h-6 w-6 p-0"
+                    >
+                      <span className="sr-only">Delete comment</span>
+                      ✕
+                    </Button>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{comment.text}</p>
               </div>

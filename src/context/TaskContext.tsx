@@ -24,6 +24,7 @@ type Comment = {
   text: string;
   createdAt: string;
   author: string;
+  likes?: number;
 };
 
 type TaskContextType = {
@@ -130,6 +131,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateTask = (id: string, updatedTask: Partial<Task>) => {
+    // Handle temp IDs specially - for new tasks being created
+    if (id.startsWith('temp-')) {
+      // We don't do anything with temp tasks in the actual task list
+      return;
+    }
+    
     setTasks(
       tasks.map((task) => (task.id === id ? { ...task, ...updatedTask } : task))
     );
@@ -156,6 +163,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addComment = (taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => {
+    // For temp tasks, we don't actually add to the task list yet
+    if (taskId.startsWith('temp-')) {
+      return;
+    }
+    
     setTasks(
       tasks.map((task) => {
         if (task.id === taskId) {
@@ -163,6 +175,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ...comment,
             id: Date.now().toString(),
             createdAt: new Date().toISOString(),
+            likes: 0,
           };
           return {
             ...task,
@@ -175,6 +188,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addAttachment = (taskId: string, attachmentUrl: string) => {
+    // For temp tasks, we don't actually add to the task list yet
+    if (taskId.startsWith('temp-')) {
+      return;
+    }
+    
     setTasks(
       tasks.map((task) => {
         if (task.id === taskId) {

@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel"
 import { format } from 'date-fns';
 import { 
   Dialog,
@@ -38,6 +45,7 @@ const TaskDialog = ({ mode, open, onOpenChange, taskId }: TaskDialogProps) => {
   const [category, setCategory] = useState<Category>('Work');
   const [recurring, setRecurring] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
   const [activeTab, setActiveTab] = useState('details');
+  const [tempTaskId, setTempTaskId] = useState<string | undefined>(undefined);
 
   // Reset form when dialog opens or closes
   useEffect(() => {
@@ -54,6 +62,7 @@ const TaskDialog = ({ mode, open, onOpenChange, taskId }: TaskDialogProps) => {
           setPriority(task.priority);
           setCategory(task.category || 'Other');
           setRecurring(task.recurring || 'none');
+          setTempTaskId(taskId);
         }
       } else if (mode === 'create') {
         // Set default values for new task
@@ -64,9 +73,19 @@ const TaskDialog = ({ mode, open, onOpenChange, taskId }: TaskDialogProps) => {
         setPriority('Medium');
         setCategory('Work');
         setRecurring('none');
+        
+        // Create a temporary task ID for new tasks
+        if (!tempTaskId) {
+          setTempTaskId(`temp-${Date.now()}`);
+        }
       }
       // Reset to first tab when opening dialog
       setActiveTab('details');
+    } else {
+      // Clear temporary task ID when closing dialog
+      if (mode === 'create') {
+        setTempTaskId(undefined);
+      }
     }
   }, [mode, taskId, tasks, open]);
 
@@ -124,9 +143,9 @@ const TaskDialog = ({ mode, open, onOpenChange, taskId }: TaskDialogProps) => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="comments" disabled={mode === 'create'}>Comments</TabsTrigger>
-            <TabsTrigger value="attachments" disabled={mode === 'create'}>Files</TabsTrigger>
-            <TabsTrigger value="dependencies" disabled={mode === 'create'}>Links</TabsTrigger>
+            <TabsTrigger value="comments">Comments</TabsTrigger>
+            <TabsTrigger value="attachments">Files</TabsTrigger>
+            <TabsTrigger value="dependencies">Links</TabsTrigger>
           </TabsList>
           
           <TabsContent value="details" className="pt-4">
@@ -226,17 +245,51 @@ const TaskDialog = ({ mode, open, onOpenChange, taskId }: TaskDialogProps) => {
           </TabsContent>
           
           <TabsContent value="comments" className="space-y-4 pt-4">
-            {taskId && <TaskComments taskId={taskId} />}
+            {tempTaskId && <TaskComments taskId={tempTaskId} />}
           </TabsContent>
           
           <TabsContent value="attachments" className="space-y-4 pt-4">
-            {taskId && <TaskAttachments taskId={taskId} />}
+            {tempTaskId && <TaskAttachments taskId={tempTaskId} />}
           </TabsContent>
           
           <TabsContent value="dependencies" className="space-y-4 pt-4">
-            {taskId && <TaskDependencies taskId={taskId} />}
+            {tempTaskId && <TaskDependencies taskId={tempTaskId} />}
           </TabsContent>
         </Tabs>
+        
+        <div className="mt-6">
+          <h3 className="text-sm font-medium mb-2">Quick View</h3>
+          <Carousel className="w-full">
+            <CarouselContent>
+              <CarouselItem className="pl-1">
+                <div className="p-4 border rounded-md">
+                  <h4 className="text-sm font-semibold mb-2">Comments</h4>
+                  <div className="h-24 overflow-y-auto">
+                    {tempTaskId && <TaskComments taskId={tempTaskId} />}
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem className="pl-1">
+                <div className="p-4 border rounded-md">
+                  <h4 className="text-sm font-semibold mb-2">Files</h4>
+                  <div className="h-24 overflow-y-auto">
+                    {tempTaskId && <TaskAttachments taskId={tempTaskId} />}
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem className="pl-1">
+                <div className="p-4 border rounded-md">
+                  <h4 className="text-sm font-semibold mb-2">Links</h4>
+                  <div className="h-24 overflow-y-auto">
+                    {tempTaskId && <TaskDependencies taskId={tempTaskId} />}
+                  </div>
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
         
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
