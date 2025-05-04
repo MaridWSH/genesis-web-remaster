@@ -19,8 +19,7 @@ import {
   CalendarIcon, 
   Tag,
   Moon,
-  Sun,
-  Eye
+  Sun
 } from 'lucide-react';
 import { format } from 'date-fns';
 import TaskDialog from './TaskDialog';
@@ -34,7 +33,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import TaskQuickView from './TaskQuickView';
 
 type FilterType = 'All' | 'Active' | 'Completed' | 'Archived';
 type SortType = 'dueDate' | 'priority' | 'alphabetical';
@@ -52,7 +50,6 @@ const TaskList = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [quickViewTaskId, setQuickViewTaskId] = useState<string | null>(null);
 
   const handleAddTask = () => {
     setDialogMode('create');
@@ -72,14 +69,6 @@ const TaskList = () => {
 
   const toggleCalendarView = () => {
     setShowCalendar(!showCalendar);
-  };
-
-  const handleOpenQuickView = (taskId: string) => {
-    setQuickViewTaskId(taskId);
-  };
-
-  const handleCloseQuickView = () => {
-    setQuickViewTaskId(null);
   };
 
   const filteredAndSortedTasks = tasks
@@ -144,8 +133,6 @@ const TaskList = () => {
   const toggleSort = () => {
     setSortDirection(current => current === 'asc' ? 'desc' : 'asc');
   };
-
-  const quickViewTask = quickViewTaskId ? tasks.find(task => task.id === quickViewTaskId) : null;
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -302,7 +289,6 @@ const TaskList = () => {
                   onDelete={deleteTask}
                   onEdit={handleEditTask}
                   onArchive={handleArchiveTask}
-                  onQuickView={handleOpenQuickView}
                 />
               ))}
             </div>
@@ -324,7 +310,6 @@ const TaskList = () => {
                   onDelete={deleteTask}
                   onEdit={handleEditTask}
                   onArchive={handleArchiveTask}
-                  onQuickView={handleOpenQuickView}
                 />
               ))}
             </div>
@@ -338,11 +323,6 @@ const TaskList = () => {
         onOpenChange={setDialogOpen}
         taskId={selectedTaskId}
       />
-
-      {/* Render the quick view component if a task is selected */}
-      {quickViewTask && (
-        <TaskQuickView task={quickViewTask} onClose={handleCloseQuickView} />
-      )}
     </div>
   );
 };
@@ -353,10 +333,9 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
   onArchive: (id: string) => void;
-  onQuickView: (id: string) => void;
 }
 
-const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive, onQuickView }: TaskItemProps) => {
+const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive }: TaskItemProps) => {
   const hasComments = task.comments && task.comments.length > 0;
   const hasAttachments = task.attachments && task.attachments.length > 0;
   const hasDependencies = task.dependencies && task.dependencies.length > 0;
@@ -469,17 +448,6 @@ const TaskItem = ({ task, onToggleCompletion, onDelete, onEdit, onArchive, onQui
       </div>
       
       <div className="flex space-x-2">
-        {/* Quick View Button - Updated Style */}
-        {(hasComments || hasAttachments || hasDependencies) && (
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => onQuickView(task.id)}
-            className="bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary"
-          >
-            <Eye size={16} />
-          </Button>
-        )}
         <Button 
           size="sm" 
           variant="outline"
