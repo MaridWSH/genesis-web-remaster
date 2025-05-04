@@ -23,11 +23,11 @@ import {
   generateSubtasks,
   DEEPSEEK_MODELS 
 } from '@/utils/deepSeekApi';
+import { useAuth } from '@/context/AuthContext';
 
 const TaskAiAssistant: React.FC = () => {
   const { tasks, updateTask } = useTasks();
-  const [apiKey, setApiKey] = useState('');
-  const [isConfigured, setIsConfigured] = useState(false);
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [selectedTask, setSelectedTask] = useState('');
@@ -37,32 +37,13 @@ const TaskAiAssistant: React.FC = () => {
     suggestedPriority: 'High' | 'Medium' | 'Low';
     reason: string;
   }>>([]);
+  const [isApiConfigured, setIsApiConfigured] = useState(false);
   
-  // Check for saved API key on component mount
+  // Check for admin-configured API key on component mount
   useEffect(() => {
-    const savedKey = localStorage.getItem('deepseek-api-key');
-    if (savedKey) {
-      setApiKey(savedKey);
-      setIsConfigured(true);
-    }
+    const adminApiKey = localStorage.getItem('admin-deepseek-api-key');
+    setIsApiConfigured(!!adminApiKey);
   }, []);
-  
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('deepseek-api-key', apiKey);
-      setIsConfigured(true);
-      toast.success("API key saved successfully");
-    } else {
-      toast.error("Please enter a valid API key");
-    }
-  };
-  
-  const handleClearApiKey = () => {
-    localStorage.removeItem('deepseek-api-key');
-    setApiKey('');
-    setIsConfigured(false);
-    toast.success("API key removed");
-  };
   
   const getIncompleteTasks = () => {
     return tasks.filter(task => !task.completed && !task.archived);
@@ -73,15 +54,16 @@ const TaskAiAssistant: React.FC = () => {
   };
   
   const handleGetAiSuggestions = async () => {
-    if (!isConfigured) {
-      toast.error("Please configure your DeepSeek API key first");
+    if (!isApiConfigured) {
+      toast.error("AI features are not configured. Please contact an administrator.");
       return;
     }
     
     setLoading(true);
     try {
       const incompleteTasks = getIncompleteTasks();
-      const suggestions = await getTaskOptimization(incompleteTasks, apiKey);
+      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
+      const suggestions = await getTaskOptimization(incompleteTasks, adminApiKey);
       setAiSuggestions(suggestions);
       toast.success("AI suggestions generated");
     } catch (error) {
@@ -93,8 +75,8 @@ const TaskAiAssistant: React.FC = () => {
   };
   
   const handleGenerateSubtasks = async () => {
-    if (!isConfigured) {
-      toast.error("Please configure your DeepSeek API key first");
+    if (!isApiConfigured) {
+      toast.error("AI features are not configured. Please contact an administrator.");
       return;
     }
     
@@ -111,7 +93,8 @@ const TaskAiAssistant: React.FC = () => {
     
     setLoading(true);
     try {
-      const generatedSubtasks = await generateSubtasks(task.title, task.notes, apiKey);
+      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
+      const generatedSubtasks = await generateSubtasks(task.title, task.notes, adminApiKey);
       setSubtasks(generatedSubtasks);
       toast.success("Subtasks generated successfully");
     } catch (error) {
@@ -123,15 +106,16 @@ const TaskAiAssistant: React.FC = () => {
   };
   
   const handleGetPrioritySuggestions = async () => {
-    if (!isConfigured) {
-      toast.error("Please configure your DeepSeek API key first");
+    if (!isApiConfigured) {
+      toast.error("AI features are not configured. Please contact an administrator.");
       return;
     }
     
     setLoading(true);
     try {
       const incompleteTasks = getIncompleteTasks();
-      const suggestions = await getAutoPrioritySuggestions(incompleteTasks, apiKey);
+      const adminApiKey = localStorage.getItem('admin-deepseek-api-key') || '';
+      const suggestions = await getAutoPrioritySuggestions(incompleteTasks, adminApiKey);
       setPrioritySuggestions(suggestions);
       toast.success("Priority suggestions generated");
     } catch (error) {
@@ -164,34 +148,25 @@ const TaskAiAssistant: React.FC = () => {
         </CardHeader>
         
         <CardContent className="pt-8 px-8">
-          {!isConfigured ? (
+          {!isApiConfigured ? (
             <div className="space-y-6">
-              <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 p-5 border border-blue-100 dark:border-blue-900/50">
+              <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 p-5 border border-amber-100 dark:border-amber-900/50">
                 <h3 className="font-medium text-lg mb-2 flex items-center">
-                  <Brain className="h-5 w-5 mr-2 text-blue-500" />
-                  Configure API Access
+                  <Brain className="h-5 w-5 mr-2 text-amber-500" />
+                  AI Features Not Available
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  To use AI features, you need to configure your DeepSeek API key. 
-                  Your API key is stored locally in your browser and never shared.
+                  The AI features are not currently configured. Please contact your administrator to enable AI assistance.
                 </p>
-              
-                <div className="space-y-4">
-                  <Label htmlFor="api-key" className="text-base">DeepSeek API Key</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="api-key"
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="Enter your DeepSeek API key"
-                      className="flex-1"
-                    />
-                    <Button onClick={handleSaveApiKey} className="bg-purple-600 hover:bg-purple-700 text-white">
-                      Save Key
-                    </Button>
+
+                {user?.id === "1" && (
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800/30">
+                    <p className="text-sm font-medium mb-2">Administrator Notice</p>
+                    <p className="text-sm text-muted-foreground">
+                      As an administrator, you can configure the DeepSeek API key in the Admin Settings panel.
+                    </p>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           ) : (
@@ -199,11 +174,8 @@ const TaskAiAssistant: React.FC = () => {
               <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-100 dark:border-green-800/30">
                 <p className="text-sm font-medium flex items-center">
                   <Lightbulb className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
-                  API key configured successfully
+                  AI features are ready to use
                 </p>
-                <Button variant="outline" size="sm" onClick={handleClearApiKey} className="text-xs">
-                  Change API Key
-                </Button>
               </div>
               
               {/* AI Features Section */}
@@ -395,7 +367,6 @@ const TaskAiAssistant: React.FC = () => {
               
               <div className="text-xs text-gray-500 mt-6 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg">
                 <p>Available models: {DEEPSEEK_MODELS.DEEPSEEK_CHAT}, {DEEPSEEK_MODELS.DEEPSEEK_CODER}</p>
-                <p className="mt-1">Your API key is stored locally in your browser and is not sent to our servers.</p>
               </div>
             </div>
           )}
