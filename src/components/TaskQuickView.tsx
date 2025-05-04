@@ -85,7 +85,7 @@ const TaskQuickView = ({ task, onClose }: TaskQuickViewProps) => {
                   </h3>
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
                     {comments.length === 0 ? (
-                      <p className="text-sm text-gray-500 italic">No comments yet</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No comments yet</p>
                     ) : (
                       comments.map(comment => (
                         <div key={comment.id} className="flex space-x-3">
@@ -96,7 +96,7 @@ const TaskQuickView = ({ task, onClose }: TaskQuickViewProps) => {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
                                 <p className="text-sm font-medium">{comment.author}</p>
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
                                   {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
                                 </span>
                               </div>
@@ -127,17 +127,17 @@ const TaskQuickView = ({ task, onClose }: TaskQuickViewProps) => {
                   </h3>
                   <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                     {attachments.length === 0 ? (
-                      <p className="text-sm text-gray-500 italic">No attachments yet</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No attachments yet</p>
                     ) : (
                       attachments.map((attachment, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                        <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                           <div className="flex items-center space-x-2">
-                            <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                            <FileText className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                             <a 
                               href={getAttachmentUrl(attachment)} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-sm font-medium text-blue-600 hover:underline"
+                              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
                             >
                               {getAttachmentName(attachment)}
                             </a>
@@ -157,15 +157,15 @@ const TaskQuickView = ({ task, onClose }: TaskQuickViewProps) => {
                   </h3>
                   <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                     {dependencies.length === 0 ? (
-                      <p className="text-sm text-gray-500 italic">No linked tasks</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No linked tasks</p>
                     ) : (
                       dependencies.map(dependencyId => {
                         const dependentTask = tasks.find(t => t.id === dependencyId);
                         return dependentTask ? (
-                          <div key={dependencyId} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                          <div key={dependencyId} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                             <div className="flex items-center space-x-2">
-                              <Link className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                              <span className="text-sm">{dependentTask.title}</span>
+                              <Link className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                              <span className="text-sm text-gray-800 dark:text-gray-200">{dependentTask.title}</span>
                             </div>
                           </div>
                         ) : null;
