@@ -22,9 +22,12 @@ const App = () => {
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   
   // Set initial dark mode class on the document
-  if (localStorage.getItem('darkMode') === 'true' || 
-     (prefersDarkMode && localStorage.getItem('darkMode') === null)) {
+  // Only apply dark mode if it's explicitly set to true in localStorage
+  if (localStorage.getItem('darkMode') === 'true') {
     document.documentElement.classList.add('dark');
+  } else {
+    // Remove dark class if not explicitly set to true
+    document.documentElement.classList.remove('dark');
   }
   
   return (
