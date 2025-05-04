@@ -1,16 +1,19 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, Settings, User, Users, Award, Calendar, Shield, LogOut } from 'lucide-react';
+import { LayoutDashboard, Settings, User, Users, Award, Calendar, LogOut } from 'lucide-react';
+
 const Header = () => {
   const {
     isAuthenticated,
     logout,
     user
   } = useAuth();
+
   if (!isAuthenticated) return null;
 
   // Get user initials for avatar
@@ -19,6 +22,7 @@ const Header = () => {
     const names = user.name.split(' ');
     return names.map(name => name[0]).join('').toUpperCase();
   };
+
   return <header className="bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
@@ -52,19 +56,19 @@ const Header = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/features?tab=teams" className="flex items-center cursor-pointer">
+                  <Link to="/features" className="flex items-center cursor-pointer">
                     <Users className="mr-2 h-4 w-4" />
                     <span>Teams</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/features?tab=achievements" className="flex items-center cursor-pointer">
+                  <Link to="/achievements" className="flex items-center cursor-pointer">
                     <Award className="mr-2 h-4 w-4" />
                     <span>Achievements</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/features?tab=calendar" className="flex items-center cursor-pointer">
+                  <Link to="/calendar" className="flex items-center cursor-pointer">
                     <Calendar className="mr-2 h-4 w-4" />
                     <span>Calendar</span>
                   </Link>
@@ -94,4 +98,5 @@ const Header = () => {
       </div>
     </header>;
 };
+
 export default Header;

@@ -1,13 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeamManagement from '@/components/TeamManagement';
 import Achievements from '@/components/Achievements';
 import CalendarIntegration from '@/components/CalendarIntegration';
 
-const Features = () => {
-  const [activeTab, setActiveTab] = useState("teams");
+interface FeaturesProps {
+  defaultTab?: string;
+}
+
+const Features: React.FC<FeaturesProps> = ({ defaultTab }) => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(defaultTab || "teams");
+  
+  // Handle tab changes from URL query params
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['teams', 'achievements', 'calendar'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    } else if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [location.search, defaultTab]);
   
   return (
     <div className="min-h-screen bg-background">

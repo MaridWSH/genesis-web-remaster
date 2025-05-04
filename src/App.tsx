@@ -19,6 +19,8 @@ import Features from "./pages/Features";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Achievements from "./pages/Achievements";
+import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,22 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <Features />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/achievements" 
+                      element={
+                        <ProtectedRoute>
+                          <Features defaultTab="achievements" />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/calendar" 
+                      element={
+                        <ProtectedRoute>
+                          <Features defaultTab="calendar" />
                         </ProtectedRoute>
                       } 
                     />
