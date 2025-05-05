@@ -60,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
       if (event === "SIGNED_IN" && session?.user) {
         await setUserData(session.user);
       } else if (event === "SIGNED_OUT") {
@@ -123,6 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
       
+      console.log("User data set:", userData);
       setUser(userData);
     } catch (error) {
       console.error("Error setting user data:", error);
@@ -140,6 +142,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // User data will be set by the auth state listener
       toast.success("Logged in successfully");
+      console.log("Login successful, session:", data.session);
+      return data;
     } catch (error: any) {
       toast.error(`Login failed: ${error.message}`);
       throw error;

@@ -30,6 +30,7 @@ const LoginForm = () => {
   // If user is already authenticated, redirect them
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("LoginForm: User is authenticated, redirecting to:", from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
@@ -39,8 +40,14 @@ const LoginForm = () => {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      // The redirect will be handled by the useEffect above
+      const result = await login(email, password);
+      console.log("Login result:", result);
+      
+      // Force navigation after successful login - don't rely only on the useEffect
+      if (result?.session) {
+        console.log("Manual navigation to:", from);
+        setTimeout(() => navigate(from, { replace: true }), 500);
+      }
     } catch (error) {
       // Error is handled in AuthContext
       console.error('Login form error:', error);
