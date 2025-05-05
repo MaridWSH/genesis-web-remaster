@@ -79,7 +79,7 @@ export const updateProfile = async (user: UserProfile, data: Partial<UserProfile
     return {
       ...user,
       ...data
-    };
+    } as UserProfile;
   } catch (error: any) {
     toast.error(`Profile update failed: ${error.message}`);
     throw error;

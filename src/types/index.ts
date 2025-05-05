@@ -1,9 +1,10 @@
-
 export type UserId = string;
 export type ProjectId = string;
 export type TeamId = string;
 export type Role = 'admin' | 'editor' | 'viewer';
 
+// We're not using this UserProfile anymore, but keeping it for backward compatibility
+// New code should import UserProfile from @/hooks/useAuthState
 export interface UserProfile {
   id: UserId;
   name: string;
