@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -8,14 +8,52 @@ import AdminUsers from '@/components/AdminUsers';
 import AdminSettings from '@/components/AdminSettings';
 import AdminAnalytics from '@/components/AdminAnalytics';
 import { Shield, Users, Settings, Activity } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminPage = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("users");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Admin access check - for demo purposes, only user with id "1" is admin
-  // In a real application, this would check a proper admin role
-  const isAdmin = user?.id === "1";
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        // Check if user is in team_members with admin role
+        const { data, error } = await supabase
+          .from('team_members')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .limit(1);
+        
+        if (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        } else {
+          // User is admin if they have at least one team with admin role
+          setIsAdmin(data && data.length > 0);
+        }
+      } catch (error) {
+        console.error('Error in admin check:', error);
+        setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAdminStatus();
+  }, [user]);
+  
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
   
   if (!isAdmin) {
     return <Navigate to="/tasks" replace />;

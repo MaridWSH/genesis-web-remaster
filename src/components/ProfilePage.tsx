@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,14 +19,23 @@ const ProfilePage = () => {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   
   // Preferences
-  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(() => {
+    return localStorage.getItem('emailNotifications') === 'true';
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => 
     localStorage.getItem('darkMode') === 'true'
   );
   
+  // Update fields when user changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
+  
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
   };
   
   const toggleDarkMode = (checked: boolean) => {
@@ -40,15 +49,19 @@ const ProfilePage = () => {
     setIsDarkMode(checked);
   };
   
+  const toggleEmailNotifications = (checked: boolean) => {
+    setEmailNotifications(checked);
+    localStorage.setItem('emailNotifications', checked.toString());
+  };
+  
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProfile(true);
     
     try {
       await updateProfile({ name, email });
-      toast.success('Profile updated successfully');
     } catch (error) {
-      toast.error('Failed to update profile');
+      console.error('Error updating profile:', error);
     } finally {
       setIsSavingProfile(false);
     }
@@ -106,7 +119,9 @@ const ProfilePage = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      disabled
                     />
+                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                   </div>
                   
                   <div className="space-y-2">
@@ -140,7 +155,7 @@ const ProfilePage = () => {
                   </div>
                   <Switch 
                     checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
+                    onCheckedChange={toggleEmailNotifications}
                   />
                 </div>
                 

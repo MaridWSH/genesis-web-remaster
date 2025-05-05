@@ -29,10 +29,11 @@ const LoginForm = () => {
 
     try {
       await login(email, password);
-      toast.success('Logged in successfully');
+      // The successful toast is shown in the AuthContext
       navigate('/tasks');
     } catch (error) {
-      toast.error('Login failed. Please check your credentials.');
+      // Error is handled in AuthContext
+      console.error('Login form error:', error);
     } finally {
       setIsSubmitting(false);
     }
