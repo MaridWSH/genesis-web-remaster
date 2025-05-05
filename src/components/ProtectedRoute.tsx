@@ -12,6 +12,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
+  // Add a state to track if we've already shown a toast
+  const [hasShownToast, setHasShownToast] = useState(false);
   
   // Use an effect to avoid flash of redirect
   useEffect(() => {
@@ -20,8 +22,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const checkAuth = () => {
       console.log("ProtectedRoute: Auth check -", isAuthenticated ? "Authenticated" : "Not authenticated");
       
-      if (!isAuthenticated && mounted) {
+      if (!isAuthenticated && mounted && !hasShownToast) {
         toast.error("You need to login to access this page");
+        setHasShownToast(true);
       }
       
       if (mounted) {
@@ -44,7 +47,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, hasShownToast]);
   
   // If we're still checking auth status, show loading
   if (isChecking) {

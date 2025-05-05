@@ -31,7 +31,7 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes (replaced cacheTime)
-      retry: 1, // Reduce retries for better performance
+      retry: 0, // Reduce retries for better performance
       refetchOnWindowFocus: false, // Prevent excessive refetching
     },
   },
@@ -57,8 +57,10 @@ const App = () => {
             <TaskProvider>
               <TeamProvider>
                 <GamificationProvider>
+                  {/* Position the Sonner toaster first to ensure it has priority */}
+                  <Sonner position="top-right" richColors closeButton duration={3000} />
                   <Toaster />
-                  <Sonner position="top-right" richColors closeButton />
+                  
                   <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<Index />} />

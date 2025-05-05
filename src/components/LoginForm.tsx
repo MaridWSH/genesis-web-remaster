@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ const LoginForm = ({ redirectPath = '/tasks' }: LoginFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +41,12 @@ const LoginForm = ({ redirectPath = '/tasks' }: LoginFormProps) => {
       const result = await login(email, password);
       
       if (result && result.session) {
-        toast.success("Login successful!");
-        
+        // Success toast is now shown in the AuthContext to avoid duplication
         console.log("Login successful, redirecting to:", redirectPath);
         // Use a small timeout to ensure state updates before navigation
         setTimeout(() => {
           navigate(redirectPath, { replace: true });
-        }, 300);
+        }, 100);
       } else {
         toast.error("Login failed - no session returned");
       }
