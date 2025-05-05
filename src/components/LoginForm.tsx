@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,7 +21,18 @@ const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
+  
+  // Get the intended destination from location state or default to '/tasks'
+  const from = location.state?.from?.pathname || '/tasks';
+  
+  // If user is already authenticated, redirect them
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +40,7 @@ const LoginForm = () => {
 
     try {
       await login(email, password);
-      // The successful toast is shown in the AuthContext
-      navigate('/tasks');
+      // The redirect will be handled by the useEffect above
     } catch (error) {
       // Error is handled in AuthContext
       console.error('Login form error:', error);
