@@ -29,7 +29,7 @@ import AiPage from "./pages/AiPage";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // 1 minute
+      staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes (replaced cacheTime)
       retry: 1, // Reduce retries for better performance
       refetchOnWindowFocus: false, // Prevent excessive refetching
@@ -53,12 +53,12 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <TaskProvider>
-            <TeamProvider>
-              <GamificationProvider>
-                <Toaster />
-                <Sonner position="top-right" richColors closeButton />
-                <BrowserRouter>
+          <BrowserRouter>
+            <TaskProvider>
+              <TeamProvider>
+                <GamificationProvider>
+                  <Toaster />
+                  <Sonner position="top-right" richColors closeButton />
                   <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<Index />} />
@@ -80,10 +80,10 @@ const App = () => {
                     {/* Fallback route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
-                </BrowserRouter>
-              </GamificationProvider>
-            </TeamProvider>
-          </TaskProvider>
+                </GamificationProvider>
+              </TeamProvider>
+            </TaskProvider>
+          </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
@@ -12,9 +13,9 @@ type UserProfile = {
 
 type AuthContextType = {
   user: UserProfile | null;
-  login: (email: string, password: string) => Promise<any>; // Updated to allow any return type
+  login: (email: string, password: string) => Promise<any>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -33,21 +34,50 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // Check for an active session when the provider loads
   useEffect(() => {
     const checkSession = async () => {
       try {
+        console.log("Checking for existing session");
+        
+        // First set up the auth listener to catch any auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+          console.log("Auth state changed:", event, currentSession?.user?.email);
+          
+          // Update session state
+          setSession(currentSession);
+          
+          if (event === "SIGNED_IN" && currentSession?.user) {
+            // Use setTimeout to prevent potential deadlock
+            setTimeout(() => {
+              setUserData(currentSession.user);
+            }, 0);
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            setSession(null);
+          }
+        });
+        
+        // Then check for existing session
         const { data, error } = await supabase.auth.getSession();
+        
         if (error) {
           console.error("Error checking session:", error);
           return;
         }
         
         if (data?.session) {
+          console.log("Found existing session for user:", data.session.user.email);
+          setSession(data.session);
           await setUserData(data.session.user);
         }
+        
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error("Session check error:", error);
       } finally {
@@ -56,20 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     checkSession();
-    
-    // Subscribe to auth changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-      if (event === "SIGNED_IN" && session?.user) {
-        await setUserData(session.user);
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-      }
-    });
-    
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
   }, []);
   
   // Helper function to fetch user profile data and set the user state
@@ -132,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const login = async (email: string, password: string) => {
     try {
+      console.log("Login attempt for:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -139,11 +156,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) throw new Error(error.message);
       
-      // User data will be set by the auth state listener
       toast.success("Logged in successfully");
       console.log("Login successful, session:", data.session);
+      
+      // Return the data so that calling code can use it if needed
       return data;
     } catch (error: any) {
+      console.error("Login error:", error.message);
       toast.error(`Login failed: ${error.message}`);
       throw error;
     }
@@ -173,9 +192,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error(error.message);
       setUser(null);
+      setSession(null);
       toast.success("Logged out successfully");
     } catch (error: any) {
       toast.error(`Logout failed: ${error.message}`);
+      throw error;
     }
   };
   
@@ -259,7 +280,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!session,
         updateProfile,
         resetPassword,
         updatePassword,

@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,26 +15,18 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
-const LoginForm = () => {
+interface LoginFormProps {
+  redirectPath?: string;
+}
+
+const LoginForm = ({ redirectPath = '/tasks' }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, isAuthenticated } = useAuth();
   
-  // Get the intended destination from location state or default to '/tasks'
-  const from = location.state?.from?.pathname || '/tasks';
-  
-  // If user is already authenticated, redirect them immediately
-  useEffect(() => {
-    if (isAuthenticated) {
-      console.log("LoginForm: User is authenticated, redirecting to:", from);
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, navigate, from]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -48,15 +40,15 @@ const LoginForm = () => {
     try {
       console.log("Attempting login...");
       const result = await login(email, password);
-      console.log("Login result:", result);
       
       if (result && result.session) {
-        toast.success("Login successful, redirecting...");
-        console.log("Manual navigation to:", from);
+        toast.success("Login successful!");
+        
+        console.log("Login successful, redirecting to:", redirectPath);
         // Use a small timeout to ensure state updates before navigation
         setTimeout(() => {
-          navigate(from, { replace: true });
-        }, 100);
+          navigate(redirectPath, { replace: true });
+        }, 300);
       } else {
         toast.error("Login failed - no session returned");
       }
