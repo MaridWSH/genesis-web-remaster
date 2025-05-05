@@ -43,8 +43,8 @@ const LoginForm = () => {
       const result = await login(email, password);
       console.log("Login result:", result);
       
-      // Force navigation after successful login - don't rely only on the useEffect
-      if (result?.session) {
+      // Check if result exists and has a session property before accessing it
+      if (result && result.session) {
         console.log("Manual navigation to:", from);
         setTimeout(() => navigate(from, { replace: true }), 500);
       }
