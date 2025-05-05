@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'sonner';
 import { UserId, TeamId } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 export type Priority = 'Low' | 'Medium' | 'High';
 export type Category = 'Work' | 'Personal' | 'Shopping' | 'Health' | 'Finance' | 'Other';
@@ -65,44 +66,10 @@ export const useTasks = () => {
 };
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Research new technologies',
-      notes: '',
-      dueDate: '2025-05-26T03:00:00.000Z',
-      priority: 'Medium',
-      completed: false,
-      category: 'Work',
-    },
-    {
-      id: '2',
-      title: 'Learn new framework',
-      notes: '',
-      dueDate: '2025-05-19T03:00:00.000Z',
-      priority: 'Low',
-      completed: false,
-      category: 'Personal',
-    },
-    {
-      id: '3',
-      title: 'Plan sprint tasks',
-      notes: '',
-      dueDate: '2025-05-31T03:00:00.000Z',
-      priority: 'High',
-      completed: false,
-      category: 'Work',
-    },
-    {
-      id: '4',
-      title: 'Refactor legacy code',
-      notes: '',
-      dueDate: '2025-05-21T03:00:00.000Z',
-      priority: 'Medium',
-      completed: false,
-      category: 'Work',
-    },
-  ]);
+  // Initialize with empty array instead of default tasks
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const { user } = useAuth();
 
   const [darkMode, setDarkMode] = useState(false);
 
@@ -143,9 +110,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dependencies: [],
       archived: false,
       // Default gamification values
-      pointsValue: task.priority === 'High' ? 10 : task.priority === 'Medium' ? 5 : 2
+      pointsValue: task.priority === 'High' ? 10 : task.priority === 'Medium' ? 5 : 2,
+      createdBy: user?.id // Associate task with the current user
     };
     setTasks([...tasks, newTask]);
+    toast.success('Task added successfully');
   };
 
   const updateTask = (id: string, updatedTask: Partial<Task>) => {
@@ -161,6 +130,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteTask = (id: string) => {
     setTasks(tasks.filter((task) => task.id !== id));
+    toast.success('Task deleted');
   };
 
   const toggleTaskCompletion = (id: string) => {
@@ -169,6 +139,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
+    // Show different toast message based on completion status
+    const task = tasks.find(t => t.id === id);
+    if (task && !task.completed) {
+      toast.success('Task completed! 🎉');
+    }
   };
 
   const archiveTask = (id: string) => {
@@ -177,6 +152,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         task.id === id ? { ...task, archived: true } : task
       )
     );
+    toast.success('Task archived');
   };
 
   const addComment = (taskId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => {
