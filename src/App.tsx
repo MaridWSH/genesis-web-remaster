@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { TeamProvider } from "@/context/TeamContext";
@@ -25,7 +25,17 @@ import Teams from "./pages/Teams";
 import AdminPage from "./pages/AdminPage";
 import AiPage from "./pages/AiPage";
 
-const queryClient = new QueryClient();
+// Create the query client with optimized settings for performance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      cacheTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1, // Reduce retries for better performance
+      refetchOnWindowFocus: false, // Prevent excessive refetching
+    },
+  },
+});
 
 const App = () => {
   // Only apply dark mode if it has been explicitly set to true
@@ -47,85 +57,27 @@ const App = () => {
             <TeamProvider>
               <GamificationProvider>
                 <Toaster />
-                <Sonner />
+                <Sonner position="top-right" richColors closeButton />
                 <BrowserRouter>
                   <Routes>
+                    {/* Public routes */}
                     <Route path="/" element={<Index />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route 
-                      path="/tasks" 
-                      element={
-                        <ProtectedRoute>
-                          <TasksPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/features" 
-                      element={
-                        <ProtectedRoute>
-                          <Features />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/achievements" 
-                      element={
-                        <ProtectedRoute>
-                          <Achievements />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/calendar" 
-                      element={
-                        <ProtectedRoute>
-                          <Calendar />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/teams" 
-                      element={
-                        <ProtectedRoute>
-                          <Teams />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/ai" 
-                      element={
-                        <ProtectedRoute>
-                          <AiPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/profile" 
-                      element={
-                        <ProtectedRoute>
-                          <Profile />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/settings" 
-                      element={
-                        <ProtectedRoute>
-                          <Settings />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/admin" 
-                      element={
-                        <ProtectedRoute>
-                          <AdminPage />
-                        </ProtectedRoute>
-                      } 
-                    />
+                    
+                    {/* Protected routes */}
+                    <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+                    <Route path="/features" element={<ProtectedRoute><Features /></ProtectedRoute>} />
+                    <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+                    <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+                    <Route path="/teams" element={<ProtectedRoute><Teams /></ProtectedRoute>} />
+                    <Route path="/ai" element={<ProtectedRoute><AiPage /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                    <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+                    
+                    {/* Fallback route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>

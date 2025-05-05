@@ -16,15 +16,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // Use an effect to avoid flash of redirect
   useEffect(() => {
     const checkAuth = () => {
+      console.log("ProtectedRoute: Auth check -", isAuthenticated ? "Authenticated" : "Not authenticated");
       if (!isAuthenticated) {
         toast.error("You need to login to access this page");
       }
       setIsChecking(false);
     };
     
-    // Short timeout to allow auth state to be checked
-    const timer = setTimeout(checkAuth, 100);
-    return () => clearTimeout(timer);
+    // Check auth state immediately if it's already determined
+    if (isAuthenticated !== undefined) {
+      checkAuth();
+    } else {
+      // Short timeout to allow auth state to be checked
+      const timer = setTimeout(checkAuth, 100);
+      return () => clearTimeout(timer);
+    }
   }, [isAuthenticated]);
   
   if (isChecking) {
@@ -32,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
   
   if (!isAuthenticated) {
-    console.log("Not authenticated, redirecting to login");
+    console.log("Not authenticated, redirecting to login from path:", location.pathname);
     // Save the location they were trying to go to
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

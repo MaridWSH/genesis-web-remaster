@@ -27,7 +27,7 @@ const LoginForm = () => {
   // Get the intended destination from location state or default to '/tasks'
   const from = location.state?.from?.pathname || '/tasks';
   
-  // If user is already authenticated, redirect them
+  // If user is already authenticated, redirect them immediately
   useEffect(() => {
     if (isAuthenticated) {
       console.log("LoginForm: User is authenticated, redirecting to:", from);
@@ -37,19 +37,30 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
+      console.log("Attempting login...");
       const result = await login(email, password);
       console.log("Login result:", result);
       
-      // Check if result exists and has a session property before accessing it
       if (result && result.session) {
+        toast.success("Login successful, redirecting...");
         console.log("Manual navigation to:", from);
-        setTimeout(() => navigate(from, { replace: true }), 500);
+        // Use a small timeout to ensure state updates before navigation
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 100);
+      } else {
+        toast.error("Login failed - no session returned");
       }
     } catch (error) {
-      // Error is handled in AuthContext
       console.error('Login form error:', error);
     } finally {
       setIsSubmitting(false);
