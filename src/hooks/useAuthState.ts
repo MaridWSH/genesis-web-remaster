@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase'; // adjust path as needed
+import { supabase } from '@/integrations/supabase/client'; // correct path to supabase client
 import { Session, User } from '@supabase/supabase-js';
 
 export type UserProfile = User | null;
