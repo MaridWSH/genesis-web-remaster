@@ -30,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Wrapping the imported functions to use our context state
   const handleLogin = async (email: string, password: string) => {
     return await login(email, password);
+    // No need to manually update state here as onAuthStateChange in useAuthState will handle it
   };
 
   const handleLogout = async () => {
