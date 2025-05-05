@@ -9,7 +9,296 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      achievements: {
+        Row: {
+          description: string
+          icon: string
+          id: string
+          name: string
+        }
+        Insert: {
+          description: string
+          icon: string
+          id?: string
+          name: string
+        }
+        Update: {
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string | null
+          email: string | null
+          id: string
+          member_since: string | null
+          name: string | null
+          streak_days: number | null
+          total_completed: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          email?: string | null
+          id: string
+          member_since?: string | null
+          name?: string | null
+          streak_days?: number | null
+          total_completed?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          email?: string | null
+          id?: string
+          member_since?: string | null
+          name?: string | null
+          streak_days?: number | null
+          total_completed?: number | null
+        }
+        Relationships: []
+      }
+      task_attachments: {
+        Row: {
+          created_at: string | null
+          id: string
+          task_id: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          task_id?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          task_id?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_attachments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_comments: {
+        Row: {
+          author: string
+          created_at: string | null
+          id: string
+          likes: number | null
+          task_id: string | null
+          text: string
+        }
+        Insert: {
+          author: string
+          created_at?: string | null
+          id?: string
+          likes?: number | null
+          task_id?: string | null
+          text: string
+        }
+        Update: {
+          author?: string
+          created_at?: string | null
+          id?: string
+          likes?: number | null
+          task_id?: string | null
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_comments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_dependencies: {
+        Row: {
+          created_at: string | null
+          depends_on_task_id: string | null
+          id: string
+          task_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          depends_on_task_id?: string | null
+          id?: string
+          task_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          depends_on_task_id?: string | null
+          id?: string
+          task_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_dependencies_depends_on_task_id_fkey"
+            columns: ["depends_on_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_dependencies_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          archived: boolean | null
+          category: string | null
+          completed: boolean | null
+          created_at: string | null
+          due_date: string | null
+          id: string
+          notes: string | null
+          points_value: number | null
+          priority: string | null
+          recurring: string | null
+          streak_task: boolean | null
+          team_id: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          archived?: boolean | null
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          points_value?: number | null
+          priority?: string | null
+          recurring?: string | null
+          streak_task?: boolean | null
+          team_id?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          archived?: boolean | null
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          points_value?: number | null
+          priority?: string | null
+          recurring?: string | null
+          streak_task?: boolean | null
+          team_id?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          id: string
+          joined_at: string | null
+          role: string | null
+          team_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string | null
+          earned_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          achievement_id?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          achievement_id?: string | null
+          earned_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
