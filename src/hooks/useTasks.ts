@@ -5,7 +5,7 @@ import { Task, Priority, Category } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
-export const useTasks = () => {
+export const useTasksData = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +42,7 @@ export const useTasks = () => {
         priority: task.priority as Priority,
         completed: task.completed || false,
         category: task.category as Category,
-        recurring: task.recurring,
+        recurring: task.recurring as "none" | "daily" | "weekly" | "monthly" | undefined,
         attachments: [],  // We'll load these in separate functions if needed
         comments: [],     // We'll load these in separate functions if needed
         dependencies: [], // We'll load these in separate functions if needed
@@ -113,7 +113,7 @@ export const useTasks = () => {
         priority: data[0].priority as Priority,
         completed: data[0].completed || false,
         category: data[0].category as Category,
-        recurring: data[0].recurring,
+        recurring: data[0].recurring as "none" | "daily" | "weekly" | "monthly" | undefined,
         attachments: [],
         comments: [],
         dependencies: [],

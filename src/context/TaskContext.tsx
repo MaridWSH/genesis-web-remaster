@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasksData } from '@/hooks/useTasks';
 import { Task, Priority, Category, Comment } from '@/types/tasks';
 import { UserId, TeamId } from '@/types';
 
@@ -39,7 +39,7 @@ export const useTasks = () => {
 export { type Task, type Priority, type Category, type Comment };
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const taskHook = useTasks();
+  const taskHook = useTasksData();
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
