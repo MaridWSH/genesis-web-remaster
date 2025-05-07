@@ -17,16 +17,17 @@ type FormProps = {
 const TaskForm = ({ mode }: FormProps) => {
   const navigate = useNavigate();
   const { taskId } = useParams();
-  const { tasks, addTask, updateTask } = useTasks();
+  const { tasks, addTask, updateTask, isLoading } = useTasks();
   
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
   const [priority, setPriority] = useState<Priority>('Medium');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (mode === 'edit' && taskId) {
+    if (mode === 'edit' && taskId && !isLoading) {
       const task = tasks.find(t => t.id === taskId);
       if (task) {
         setTitle(task.title);
@@ -41,9 +42,9 @@ const TaskForm = ({ mode }: FormProps) => {
         toast.error('Task not found');
       }
     }
-  }, [mode, taskId, tasks, navigate]);
+  }, [mode, taskId, tasks, navigate, isLoading]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title) {
@@ -56,29 +57,38 @@ const TaskForm = ({ mode }: FormProps) => {
       return;
     }
 
-    const combinedDate = new Date(`${dueDate}T${dueTime || '00:00'}`);
-    
-    if (mode === 'create') {
-      addTask({
-        title,
-        notes,
-        dueDate: combinedDate.toISOString(),
-        priority,
-        completed: false,
-      });
-      toast.success('Task created successfully');
-    } else if (mode === 'edit' && taskId) {
-      updateTask(taskId, {
-        title,
-        notes,
-        dueDate: combinedDate.toISOString(),
-        priority,
-      });
-      toast.success('Task updated successfully');
+    try {
+      setIsSubmitting(true);
+      const combinedDate = new Date(`${dueDate}T${dueTime || '00:00'}`);
+      
+      if (mode === 'create') {
+        await addTask({
+          title,
+          notes,
+          dueDate: combinedDate.toISOString(),
+          priority,
+          completed: false,
+        });
+      } else if (mode === 'edit' && taskId) {
+        await updateTask(taskId, {
+          title,
+          notes,
+          dueDate: combinedDate.toISOString(),
+          priority,
+        });
+      }
+      
+      navigate('/tasks');
+    } catch (err) {
+      console.error('Error saving task:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    navigate('/tasks');
   };
+
+  if (isLoading && mode === 'edit') {
+    return <div className="flex justify-center items-center h-64">Loading task data...</div>;
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -89,7 +99,7 @@ const TaskForm = ({ mode }: FormProps) => {
         <h1 className="text-2xl font-semibold">{mode === 'create' ? 'Create Task' : 'Edit Task'}</h1>
       </div>
       
-      <div className="bg-white p-6 rounded-md shadow-sm">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-md shadow-sm">
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="title" className="block mb-2">Task title</label>
@@ -150,8 +160,12 @@ const TaskForm = ({ mode }: FormProps) => {
             <Button type="button" variant="outline" onClick={() => navigate('/tasks')}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-primary hover:bg-primary/90">
-              {mode === 'create' ? 'Save Task' : 'Save Changes'}
+            <Button 
+              type="submit" 
+              className="bg-primary hover:bg-primary/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : (mode === 'create' ? 'Save Task' : 'Save Changes')}
             </Button>
           </div>
         </form>

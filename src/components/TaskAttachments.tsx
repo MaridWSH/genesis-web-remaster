@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTasks } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,9 +13,15 @@ interface TaskAttachmentsProps {
 const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
   const { tasks, addAttachment, updateTask } = useTasks();
   const [attachmentUrl, setAttachmentUrl] = useState('');
+  const [attachments, setAttachments] = useState<string[]>([]);
   
   const task = tasks.find(t => t.id === taskId);
-  const attachments = task?.attachments || [];
+  
+  useEffect(() => {
+    if (task) {
+      setAttachments(task.attachments || []);
+    }
+  }, [task]);
   
   // In a real app, this would upload the file to storage
   // Here we're just simulating it by allowing URL input
@@ -23,8 +29,8 @@ const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
     e.preventDefault();
     if (attachmentUrl.trim()) {
       addAttachment(taskId, attachmentUrl);
+      setAttachments(prev => [...prev, attachmentUrl]);
       setAttachmentUrl('');
-      toast.success('Attachment added');
     }
   };
   
@@ -36,7 +42,7 @@ const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
       // For demo purposes, we'll create an object URL
       const url = URL.createObjectURL(file);
       addAttachment(taskId, `${file.name}|${url}`);
-      toast.success(`Uploaded ${file.name}`);
+      setAttachments(prev => [...prev, `${file.name}|${url}`]);
       e.target.value = ''; // Reset input
     }
   };
@@ -46,7 +52,7 @@ const TaskAttachments = ({ taskId }: TaskAttachmentsProps) => {
       const updatedAttachments = [...attachments];
       updatedAttachments.splice(index, 1);
       updateTask(taskId, { attachments: updatedAttachments });
-      toast.success('Attachment removed');
+      setAttachments(updatedAttachments);
     }
   };
   

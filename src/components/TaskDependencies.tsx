@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTasks } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,9 +13,15 @@ interface TaskDependenciesProps {
 const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
   const { tasks, updateTask } = useTasks();
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
+  const [dependencies, setDependencies] = useState<string[]>([]);
   
   const currentTask = tasks.find(t => t.id === taskId);
-  const dependencies = currentTask?.dependencies || [];
+  
+  useEffect(() => {
+    if (currentTask) {
+      setDependencies(currentTask.dependencies || []);
+    }
+  }, [currentTask]);
   
   const availableTasks = tasks.filter(task => 
     task.id !== taskId && !dependencies.includes(task.id)
@@ -23,9 +29,11 @@ const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
   
   const handleAddDependency = () => {
     if (selectedTaskId && currentTask) {
+      const newDependencies = [...dependencies, selectedTaskId];
       updateTask(taskId, {
-        dependencies: [...dependencies, selectedTaskId]
+        dependencies: newDependencies
       });
+      setDependencies(newDependencies);
       setSelectedTaskId('');
       toast.success('Task linked');
     }
@@ -33,9 +41,11 @@ const TaskDependencies = ({ taskId }: TaskDependenciesProps) => {
   
   const handleRemoveDependency = (dependencyId: string) => {
     if (currentTask) {
+      const newDependencies = dependencies.filter(id => id !== dependencyId);
       updateTask(taskId, {
-        dependencies: dependencies.filter(id => id !== dependencyId)
+        dependencies: newDependencies
       });
+      setDependencies(newDependencies);
       toast.success('Link removed');
     }
   };
