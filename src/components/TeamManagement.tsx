@@ -136,14 +136,15 @@ const TeamManagement = () => {
   
   const getMemberInitials = (userId: string) => {
     if (user && userId === user.id) {
-      return user.name.split(' ').map(n => n[0]).join('');
+      // Make sure user.name exists and is a string before calling split
+      return user.name ? user.name.split(' ').map(n => n[0]).join('') : 'U';
     }
-    return 'U';
+    return 'U'; // Default fallback
   };
   
   const getMemberName = (userId: string) => {
     if (user && userId === user.id) {
-      return user.name + ' (You)';
+      return (user.name || 'You') + ' (You)';
     }
     return 'Team Member';
   };
